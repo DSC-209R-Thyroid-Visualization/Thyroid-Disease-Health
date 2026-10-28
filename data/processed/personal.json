@@ -1,0 +1,586 @@
+{
+  "draws": [
+    {
+      "id": 0,
+      "date": "2024-01-29",
+      "status": "hyperthyroid",
+      "dose_mg": 0.0
+    },
+    {
+      "id": 1,
+      "date": "2024-02-01",
+      "status": "hyperthyroid",
+      "dose_mg": 0.0
+    },
+    {
+      "id": 2,
+      "date": "2024-03-21",
+      "status": "subclinical_hyper",
+      "dose_mg": 10.0
+    },
+    {
+      "id": 3,
+      "date": "2024-05-20",
+      "status": "hypothyroid",
+      "dose_mg": 10.0
+    },
+    {
+      "id": 4,
+      "date": "2024-06-26",
+      "status": "hyperthyroid",
+      "dose_mg": 0.0
+    },
+    {
+      "id": 5,
+      "date": "2024-08-07",
+      "status": "subclinical_hyper",
+      "dose_mg": 7.5
+    },
+    {
+      "id": 6,
+      "date": "2024-10-11",
+      "status": "subclinical_hyper",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 7,
+      "date": "2024-12-09",
+      "status": "subclinical_hyper",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 8,
+      "date": "2025-03-21",
+      "status": "euthyroid",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 9,
+      "date": "2025-06-01",
+      "status": "euthyroid",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 10,
+      "date": "2025-06-05",
+      "status": "euthyroid",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 11,
+      "date": "2025-10-21",
+      "status": "euthyroid",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 12,
+      "date": "2025-12-09",
+      "status": "euthyroid",
+      "dose_mg": 2.5
+    },
+    {
+      "id": 13,
+      "date": "2026-04-24",
+      "status": "euthyroid",
+      "dose_mg": 2.5
+    },
+    {
+      "id": 14,
+      "date": "2026-05-29",
+      "status": "hyperthyroid",
+      "dose_mg": 2.5
+    },
+    {
+      "id": 15,
+      "date": "2026-06-26",
+      "status": "subclinical_hyper",
+      "dose_mg": 5.0
+    },
+    {
+      "id": 16,
+      "date": "2026-08-03",
+      "status": "subclinical_hyper",
+      "dose_mg": 7.5
+    },
+    {
+      "id": 17,
+      "date": "2026-10-26",
+      "status": "subclinical_hypo",
+      "dose_mg": 7.5
+    }
+  ],
+  "labs": [
+    {
+      "draw_id": 0,
+      "date": "2024-01-29",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 0,
+      "date": "2024-01-29",
+      "lab": "TT4",
+      "value": 204.63,
+      "censored": false
+    },
+    {
+      "draw_id": 1,
+      "date": "2024-02-01",
+      "lab": "T3",
+      "value": 4.2,
+      "censored": false
+    },
+    {
+      "draw_id": 1,
+      "date": "2024-02-01",
+      "lab": "TSI",
+      "value": 11.1,
+      "censored": false
+    },
+    {
+      "draw_id": 2,
+      "date": "2024-03-21",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 2,
+      "date": "2024-03-21",
+      "lab": "FT4",
+      "value": 1.51,
+      "censored": false
+    },
+    {
+      "draw_id": 2,
+      "date": "2024-03-21",
+      "lab": "T3",
+      "value": 1.9,
+      "censored": false
+    },
+    {
+      "draw_id": 3,
+      "date": "2024-05-20",
+      "lab": "TSH",
+      "value": 0.45,
+      "censored": false
+    },
+    {
+      "draw_id": 3,
+      "date": "2024-05-20",
+      "lab": "FT4",
+      "value": 0.63,
+      "censored": false
+    },
+    {
+      "draw_id": 3,
+      "date": "2024-05-20",
+      "lab": "T3",
+      "value": 0.8,
+      "censored": false
+    },
+    {
+      "draw_id": 4,
+      "date": "2024-06-26",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 4,
+      "date": "2024-06-26",
+      "lab": "FT4",
+      "value": 3.28,
+      "censored": false
+    },
+    {
+      "draw_id": 4,
+      "date": "2024-06-26",
+      "lab": "T3",
+      "value": 2.9,
+      "censored": false
+    },
+    {
+      "draw_id": 5,
+      "date": "2024-08-07",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 5,
+      "date": "2024-08-07",
+      "lab": "FT4",
+      "value": 1.28,
+      "censored": false
+    },
+    {
+      "draw_id": 5,
+      "date": "2024-08-07",
+      "lab": "T3",
+      "value": 1.3,
+      "censored": false
+    },
+    {
+      "draw_id": 6,
+      "date": "2024-10-11",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 6,
+      "date": "2024-10-11",
+      "lab": "FT4",
+      "value": 1.59,
+      "censored": false
+    },
+    {
+      "draw_id": 6,
+      "date": "2024-10-11",
+      "lab": "T3",
+      "value": 1.6,
+      "censored": false
+    },
+    {
+      "draw_id": 7,
+      "date": "2024-12-09",
+      "lab": "TSH",
+      "value": 0.26,
+      "censored": false
+    },
+    {
+      "draw_id": 7,
+      "date": "2024-12-09",
+      "lab": "FT4",
+      "value": 1.11,
+      "censored": false
+    },
+    {
+      "draw_id": 7,
+      "date": "2024-12-09",
+      "lab": "T3",
+      "value": 1.0,
+      "censored": false
+    },
+    {
+      "draw_id": 8,
+      "date": "2025-03-21",
+      "lab": "TSH",
+      "value": 2.31,
+      "censored": false
+    },
+    {
+      "draw_id": 8,
+      "date": "2025-03-21",
+      "lab": "FT4",
+      "value": 1.06,
+      "censored": false
+    },
+    {
+      "draw_id": 8,
+      "date": "2025-03-21",
+      "lab": "T3",
+      "value": 1.0,
+      "censored": false
+    },
+    {
+      "draw_id": 9,
+      "date": "2025-06-01",
+      "lab": "TSH",
+      "value": 1.66,
+      "censored": false
+    },
+    {
+      "draw_id": 10,
+      "date": "2025-06-05",
+      "lab": "TSH",
+      "value": 1.5,
+      "censored": false
+    },
+    {
+      "draw_id": 10,
+      "date": "2025-06-05",
+      "lab": "FT4",
+      "value": 1.11,
+      "censored": false
+    },
+    {
+      "draw_id": 10,
+      "date": "2025-06-05",
+      "lab": "T3",
+      "value": 1.2,
+      "censored": false
+    },
+    {
+      "draw_id": 10,
+      "date": "2025-06-05",
+      "lab": "TSI",
+      "value": 3.14,
+      "censored": false
+    },
+    {
+      "draw_id": 10,
+      "date": "2025-06-05",
+      "lab": "TRAb",
+      "value": 5.11,
+      "censored": false
+    },
+    {
+      "draw_id": 11,
+      "date": "2025-10-21",
+      "lab": "TSH",
+      "value": 4.13,
+      "censored": false
+    },
+    {
+      "draw_id": 11,
+      "date": "2025-10-21",
+      "lab": "FT4",
+      "value": 0.96,
+      "censored": false
+    },
+    {
+      "draw_id": 11,
+      "date": "2025-10-21",
+      "lab": "T3",
+      "value": 1.1,
+      "censored": false
+    },
+    {
+      "draw_id": 12,
+      "date": "2025-12-09",
+      "lab": "TSH",
+      "value": 3.37,
+      "censored": false
+    },
+    {
+      "draw_id": 12,
+      "date": "2025-12-09",
+      "lab": "FT4",
+      "value": 1.18,
+      "censored": false
+    },
+    {
+      "draw_id": 12,
+      "date": "2025-12-09",
+      "lab": "T3",
+      "value": 1.2,
+      "censored": false
+    },
+    {
+      "draw_id": 13,
+      "date": "2026-04-24",
+      "lab": "TSH",
+      "value": 1.01,
+      "censored": false
+    },
+    {
+      "draw_id": 13,
+      "date": "2026-04-24",
+      "lab": "FT4",
+      "value": 1.43,
+      "censored": false
+    },
+    {
+      "draw_id": 13,
+      "date": "2026-04-24",
+      "lab": "T3",
+      "value": 1.4,
+      "censored": false
+    },
+    {
+      "draw_id": 14,
+      "date": "2026-05-29",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 14,
+      "date": "2026-05-29",
+      "lab": "FT4",
+      "value": 1.89,
+      "censored": false
+    },
+    {
+      "draw_id": 14,
+      "date": "2026-05-29",
+      "lab": "T3",
+      "value": 2.1,
+      "censored": false
+    },
+    {
+      "draw_id": 14,
+      "date": "2026-05-29",
+      "lab": "TSI",
+      "value": 5.06,
+      "censored": false
+    },
+    {
+      "draw_id": 14,
+      "date": "2026-05-29",
+      "lab": "TRAb",
+      "value": 9.71,
+      "censored": false
+    },
+    {
+      "draw_id": 15,
+      "date": "2026-06-26",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 15,
+      "date": "2026-06-26",
+      "lab": "FT4",
+      "value": 1.52,
+      "censored": false
+    },
+    {
+      "draw_id": 15,
+      "date": "2026-06-26",
+      "lab": "T3",
+      "value": 1.5,
+      "censored": false
+    },
+    {
+      "draw_id": 16,
+      "date": "2026-08-03",
+      "lab": "TSH",
+      "value": 0.01,
+      "censored": true
+    },
+    {
+      "draw_id": 16,
+      "date": "2026-08-03",
+      "lab": "FT4",
+      "value": 1.5,
+      "censored": false
+    },
+    {
+      "draw_id": 16,
+      "date": "2026-08-03",
+      "lab": "T3",
+      "value": 1.6,
+      "censored": false
+    },
+    {
+      "draw_id": 17,
+      "date": "2026-10-26",
+      "lab": "TSH",
+      "value": 4.63,
+      "censored": false
+    },
+    {
+      "draw_id": 17,
+      "date": "2026-10-26",
+      "lab": "FT4",
+      "value": 0.94,
+      "censored": false
+    },
+    {
+      "draw_id": 17,
+      "date": "2026-10-26",
+      "lab": "T3",
+      "value": 0.7,
+      "censored": false
+    }
+  ],
+  "dose_spans": [
+    {
+      "start": "2024-01-29",
+      "end": "2024-02-01",
+      "dose_mg": 0.0
+    },
+    {
+      "start": "2024-02-01",
+      "end": "2024-05-20",
+      "dose_mg": 10.0
+    },
+    {
+      "start": "2024-05-20",
+      "end": "2024-06-26",
+      "dose_mg": 0.0
+    },
+    {
+      "start": "2024-06-26",
+      "end": "2024-08-07",
+      "dose_mg": 7.5
+    },
+    {
+      "start": "2024-08-07",
+      "end": "2025-10-21",
+      "dose_mg": 5.0
+    },
+    {
+      "start": "2025-10-21",
+      "end": "2026-05-29",
+      "dose_mg": 2.5
+    },
+    {
+      "start": "2026-05-29",
+      "end": "2026-06-26",
+      "dose_mg": 5.0
+    },
+    {
+      "start": "2026-06-26",
+      "end": "2026-10-26",
+      "dose_mg": 7.5
+    },
+    {
+      "start": "2026-10-26",
+      "end": null,
+      "dose_mg": null
+    }
+  ],
+  "status_spans": [
+    {
+      "start": "2024-01-29",
+      "end": "2024-03-21",
+      "status": "hyperthyroid"
+    },
+    {
+      "start": "2024-03-21",
+      "end": "2024-05-20",
+      "status": "subclinical_hyper"
+    },
+    {
+      "start": "2024-05-20",
+      "end": "2024-06-26",
+      "status": "hypothyroid"
+    },
+    {
+      "start": "2024-06-26",
+      "end": "2024-08-07",
+      "status": "hyperthyroid"
+    },
+    {
+      "start": "2024-08-07",
+      "end": "2025-03-21",
+      "status": "subclinical_hyper"
+    },
+    {
+      "start": "2025-03-21",
+      "end": "2026-05-29",
+      "status": "euthyroid"
+    },
+    {
+      "start": "2026-05-29",
+      "end": "2026-06-26",
+      "status": "hyperthyroid"
+    },
+    {
+      "start": "2026-06-26",
+      "end": "2026-10-26",
+      "status": "subclinical_hyper"
+    },
+    {
+      "start": "2026-10-26",
+      "end": null,
+      "status": "subclinical_hypo"
+    }
+  ]
+}
