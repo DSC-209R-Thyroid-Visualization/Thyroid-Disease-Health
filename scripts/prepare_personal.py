@@ -14,8 +14,6 @@ SRC = ROOT / "data" / "personal_thyroid.csv"
 OUT = ROOT / "data" / "processed" / "personal.json"
 
 LABS = ["TSH", "FT4", "T3", "TT4", "TSI", "TRAb"]
-# Lowest value the lab reports for TSH; results at this value really mean "<0.01".
-TSH_FLOOR = 0.01
 # personal_thyroid.csv stores T3 in nmol/L (Kaggle units); the lab reports ng/mL.
 T3_NMOL_PER_NGML = 1.536
 
@@ -71,7 +69,6 @@ def main():
                 "date": d["date"],
                 "lab": lab,
                 "value": value,
-                "censored": lab == "TSH" and value <= TSH_FLOOR,
             })
 
     # Dose taken at draw i began at draw i-1. The first draw has no earlier
