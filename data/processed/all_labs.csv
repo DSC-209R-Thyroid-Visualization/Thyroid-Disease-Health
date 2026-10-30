@@ -315,3 +315,46 @@ date,group,panel,test,loinc,value,unit,censor,ref_low,ref_high,flag
 2026-08-03,Thyroid,"Free Thyroxine, Blood Green Plasma Separator Tube",Free T4,3024-7,1.5,ng/dL,,0.93,1.7,N
 2026-08-03,Thyroid,"Total T3, Blood Green Plasma Separator Tube",T3 Total,3053-6,1.6,ng/mL,,0.8,2.0,N
 2026-08-03,Thyroid,"TSH, Blood - See Instructions",TSH,11580-8,0.01,uIU/mL,,0.27,4.2,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,WBC,6690-2,5.0,1000/mm3,,4.0,10.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,RBC,789-8,5.1,mill/mm3,,4.6,6.1,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Hgb,718-7,15.3,gm/dL,,13.7,17.5,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Hct,4544-3,45.5,%,,40.0,50.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,MCV,787-2,89.2,um3,,79.0,95.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,MCH,785-6,30.0,pgm,,26.0,32.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,MCHC,786-4,33.6,g/dL,,32.0,36.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,RDW,788-0,13.0,%,,12.0,14.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,MPV,32623-1,10.5,fL,,9.4,12.4,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Plt Count,777-3,246.0,1000/mm3,,140.0,370.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Segs,770-8,58.9,%,,,,
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Imm Gran %,71695-1,0.2,%,,,1.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Lymphocytes,736-9,29.9,%,,,,
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Monocytes,5905-5,7.4,%,,,,
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Eosinophils,714-6,3.0,%,,,,
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Basophils,706-2,0.6,%,,,,
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Imm Gran Abs,53115-2,0.0,1000/mm3,,,0.1,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,ANC,751-8,3.0,1000/mm3,,1.6,7.0,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Abs Lymphs,731-0,1.5,1000/mm3,,0.8,3.1,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Abs Monos,742-7,0.4,1000/mm3,,0.2,0.8,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Abs Eosinophils,711-2,0.2,1000/mm3,,0.0,0.5,N
+2026-10-26,Blood counts,CBC w/ Diff Lavender,Abs Basophils,704-7,0.0,1000/mm3,,,0.2,N
+2026-10-26,Lipids,Lipid Panel Green Plasma Separator Tube,Cholesterol,2093-3,195.0,mg/dL,,,200.0,N
+2026-10-26,Lipids,Lipid Panel Green Plasma Separator Tube,HDL-Cholesterol,2085-9,48.0,mg/dL,,,,
+2026-10-26,Lipids,Lipid Panel Green Plasma Separator Tube,LDL-Chol (Calc),13457-7,117.0,mg/dL,,,160.0,N
+2026-10-26,Lipids,Lipid Panel Green Plasma Separator Tube,Non-HDL Cholesterol,43396-1,147.0,mg/dL,,,,
+2026-10-26,Lipids,Lipid Panel Green Plasma Separator Tube,Triglycerides,2571-8,173.0,mg/dL,,10.0,170.0,H
+2026-10-26,Blood sugar,CMP,Glucose,2345-7,100.0,mg/dL,,70.0,99.0,H
+2026-10-26,Kidney & electrolytes,CMP,BUN,3094-0,14.0,mg/dL,,6.0,20.0,N
+2026-10-26,Kidney & electrolytes,CMP,Creatinine,2160-0,0.9,mg/dL,,0.67,1.17,N
+2026-10-26,Kidney & electrolytes,CMP,eGFR,98979-8,90.0,mL/min/1.73m2,>,90.0,,N
+2026-10-26,Kidney & electrolytes,CMP,Sodium,2951-2,139.0,mmol/L,,136.0,145.0,N
+2026-10-26,Kidney & electrolytes,CMP,Potassium,2823-3,4.4,mmol/L,,3.5,5.1,N
+2026-10-26,Kidney & electrolytes,CMP,Chloride,2075-0,102.0,mmol/L,,98.0,107.0,N
+2026-10-26,Kidney & electrolytes,CMP,Bicarbonate,1963-8,28.0,mmol/L,,22.0,29.0,N
+2026-10-26,Kidney & electrolytes,CMP,Anion Gap,33037-3,9.0,mmol/L,,7.0,15.0,N
+2026-10-26,Kidney & electrolytes,CMP,Calcium,17861-6,9.6,mg/dL,,8.5,10.6,N
+2026-10-26,Liver,CMP,Total Protein,2885-2,7.2,g/dL,,6.0,8.0,N
+2026-10-26,Liver,CMP,Albumin,61151-7,4.5,g/dL,,3.5,5.2,N
+2026-10-26,Liver,CMP,"Bilirubin, Total",1975-2,0.51,mg/dL,,,1.2,N
+2026-10-26,Liver,CMP,AST,1920-8,31.0,U/L,,0.0,50.0,N
+2026-10-26,Liver,CMP,ALT,1744-2,45.0,U/L,,0.0,50.0,N
+2026-10-26,Liver,CMP,Alkaline Phosphatase,6768-6,80.0,U/L,,40.0,129.0,N
