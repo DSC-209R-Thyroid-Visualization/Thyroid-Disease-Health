@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thyroid labs vs. methimazole dose</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+  <main>
+    <section id="dose-response">
+      <div class="chart-header">
+        <div>
+          <h2 id="dose-title">Thyroid labs vs. methimazole dose (raw)</h2>
+          <div id="dose-view" class="toggle" role="group" aria-label="View">
+            <button type="button" value="raw" class="active">Raw</button>
+            <button type="button" value="normalized">Normalized</button>
+            <button type="button" value="overlay">Overlay</button>
+            <button type="button" value="all">All Markers</button>
+          </div>
+          <button type="button" id="dose-reset" class="reset" disabled>Reset</button>
+          <select id="marker-group" class="group-select" aria-label="Marker group" style="display: none"></select>
+        </div>
+        <div id="dose-readout" class="readout">Hover to compare draws; click a data point to read the journal; drag to zoom</div>
+      </div>
+      <div class="chart-row">
+        <div id="dose-chart"></div>
+        <div id="side" class="side">
+          <aside id="journal" class="journal" aria-live="polite"></aside>
+          <dl class="status-key">
+            <dt>* My Status</dt>
+            <dd>Each draw compared to the UCSD reference ranges.</dd>
+            <dt><span class="swatch" style="background: #e34948"></span>hyperthyroid</dt>
+            <dd>Free T4 or T3 above range</dd>
+            <dt><span class="swatch" style="background: #eda100"></span>subclinical hyper</dt>
+            <dd>TSH below range, Free T4 and T3 in range</dd>
+            <dt><span class="swatch" style="background: #1baf7a"></span>euthyroid</dt>
+            <dd>TSH, Free T4 and T3 all in range</dd>
+            <dt><span class="swatch" style="background: #6250d6"></span>subclinical hypo</dt>
+            <dd>TSH above range, Free T4 and T3 in range</dd>
+            <dt><span class="swatch" style="background: #2a78d6"></span>hypothyroid</dt>
+            <dd>Free T4 or T3 below range</dd>
+            <dt class="key-break">** Lookalikes</dt>
+            <dd>What the 50 Kaggle patients with the closest TSH and T3 were diagnosed with. Their
+              clinicians also had T4, symptoms and treatment history, so this can differ from My Status,
+              which only compares my labs to the UCSD reference ranges.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="dose_response.js"></script>
+</body>
+</html>

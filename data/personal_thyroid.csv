@@ -1,6 +1,5 @@
 age,sex,on_thyroxine,query_on_thyroxine,on_antithyroid_meds,sick,pregnant,thyroid_surgery,I131_treatment,query_hypothyroid,query_hyperthyroid,lithium,goitre,tumor,hypopituitary,psych,TSH_measured,TSH,T3_measured,T3,TT4_measured,TT4,T4U_measured,T4U,FTI_measured,FTI,TBG_measured,TBG,referral_source,target,patient_id,date,FT4,TSI,TRAb,methimazole_mg,lab_status
-37,M,f,f,f,f,f,f,f,f,t,f,f,f,f,f,t,0.01,f,,t,204.63,f,,f,,f,,other,A,self,1/29/2024,,,,0,hyperthyroid
-37,M,f,f,f,f,f,f,f,f,t,f,f,f,f,f,f,,t,6.45,f,,f,,f,,f,,other,A,self,2/1/2024,,11.1,,0,hyperthyroid
+37,M,f,f,f,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,6.45,t,204.63,f,,f,,f,,other,A,self,1/29/2024,,11.1,,0,hyperthyroid
 37,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,2.92,f,,f,,f,,f,,other,O,self,3/21/2024,1.51,,,10,subclinical_hyper
 37,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,0.45,t,1.23,f,,f,,f,,f,,other,O,self,5/20/2024,0.63,,,10,hypothyroid
 37,M,f,f,f,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,4.45,f,,f,,f,,f,,other,A,self,6/26/2024,3.28,,,0,hyperthyroid
@@ -16,4 +15,4 @@ age,sex,on_thyroxine,query_on_thyroxine,on_antithyroid_meds,sick,pregnant,thyroi
 39,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,3.23,f,,f,,f,,f,,other,O,self,5/29/2026,1.89,5.06,9.71,2.5,hyperthyroid
 39,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,2.3,f,,f,,f,,f,,other,O,self,6/26/2026,1.52,,,5,subclinical_hyper
 40,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,0.01,t,2.46,f,,f,,f,,f,,other,O,self,8/3/2026,1.5,,,7.5,subclinical_hyper
-40,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,4.63,t,1,f,,f,,f,,f,,other,O,self,10/26/2026,0.94,,,7.5,subclinical_hypo
+40,M,f,f,t,f,f,f,f,f,t,f,f,f,f,f,t,4.63,t,1,f,,f,,f,,f,,other,O,self,10/26/2026,0.94,,,7.5,hypothyroid

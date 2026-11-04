@@ -1,0 +1,250 @@
+:root {
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink2: #52514e;
+  --muted: #a3a29c;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+}
+
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.toggle {
+  display: inline-flex;
+  margin-top: 10px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--ink2);
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 14px;
+  cursor: pointer;
+}
+
+.toggle button + button {
+  border-left: 1px solid var(--muted);
+}
+
+.toggle button.active {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.reset {
+  margin-left: 8px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink2);
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 14px;
+  cursor: pointer;
+}
+
+.group-select {
+  margin-left: 8px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.reset:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.readout {
+  color: var(--ink2);
+  font-size: 12px;
+  text-align: right;
+  line-height: 1.5;
+  min-height: 36px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-note {
+  fill: var(--ink2);
+  font-size: 12px;
+}
+
+.chart-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+#dose-chart {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right column: the journal at the top, the status key near the status strip. */
+.side {
+  flex: 0 0 260px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.journal {
+  margin-top: 96px;
+  padding: 16px 18px;
+  border-left: 3px solid var(--muted);
+  line-height: 1.55;
+  transition: opacity 0.35s ease;
+}
+
+.journal.faded {
+  opacity: 0;
+  transition-duration: 0.2s;
+}
+
+.journal h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.journal-meta {
+  margin: 0 0 12px;
+  color: var(--ink2);
+  font-size: 12px;
+}
+
+.journal-entry {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.journal-hint {
+  margin: 0;
+  color: var(--ink2);
+  font-style: italic;
+}
+
+#dose-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.axis text {
+  fill: var(--ink2);
+  font-size: 11px;
+}
+
+.axis path,
+.axis line {
+  stroke: var(--muted);
+}
+
+.grid line {
+  stroke: var(--muted);
+  stroke-opacity: 0.3;
+  stroke-width: 0.6;
+}
+
+.grid path {
+  display: none;
+}
+
+.panel-label {
+  fill: var(--ink2);
+  font-size: 12px;
+}
+
+.legend text {
+  fill: var(--ink2);
+  font-size: 11px;
+}
+
+.cell-title {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cell-unit {
+  fill: var(--ink2);
+  font-weight: 400;
+}
+
+.cell-value {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.strip-value {
+  fill: var(--surface);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.status-key {
+  margin: auto 0 60px;
+  padding-left: 21px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink2);
+}
+
+.status-key dt {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.status-key .key-break {
+  margin-top: 12px;
+}
+
+.status-key dd {
+  margin: 0 0 6px;
+}
+
+.status-key .swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 2px;
+  opacity: 0.75;
+}
