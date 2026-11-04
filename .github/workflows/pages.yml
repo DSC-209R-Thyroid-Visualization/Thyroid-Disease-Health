@@ -1,0 +1,50 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # The page loads its data from ../data, so the site keeps the repo's layout (web/ next to data/).
+      # Only the files the page reads are published; the root redirects to web/.
+      - name: Build site
+        run: |
+          mkdir -p _site/data/processed
+          cp -r web _site/web
+          cp data/journal.json _site/data/
+          cp data/processed/personal.json data/processed/all_labs.csv data/processed/lookalikes.json _site/data/processed/
+          printf '<!DOCTYPE html>\n<meta charset="utf-8">\n<meta http-equiv="refresh" content="0; url=web/">\n<link rel="canonical" href="web/">\n<a href="web/">Thyroid labs vs. methimazole dose</a>\n' > _site/index.html
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
