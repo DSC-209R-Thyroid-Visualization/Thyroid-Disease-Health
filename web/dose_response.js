@@ -4,6 +4,8 @@
 const BLUE = "#2a78d6", ORANGE = "#eb6834";
 const SURFACE = "#fcfcfb", INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#a3a29c";
 const REF_GREEN = "#39FF14";
+// Callout buttons: a mid grey, light enough not to read as black but dark enough for the white +.
+const CALLOUT_GREY = "#7a7973";
 const STATUS_COLORS = {
   hyperthyroid: "#e34948",
   subclinical_hyper: "#eda100",
@@ -14,6 +16,15 @@ const STATUS_COLORS = {
 // Kaggle diagnosis groups for the lookalikes strip (same hues as the matching statuses).
 const LOOKALIKE_GROUPS = ["hyper", "normal", "hypo"];
 const LOOKALIKE_COLORS = { hyper: "#e34948", normal: "#1baf7a", hypo: "#2a78d6" };
+// Callouts from pnidadavolu/lookalikes_prototype.ipynb: stretches where My Status and the lookalikes
+// disagree most, from the first draw to the last draw in each stretch.
+const CALLOUTS = [
+  { start: "2024-05-20", end: "2024-05-20", lines: ["My Status: hypo", "lookalikes: 100% normal"] },
+  { start: "2024-08-07", end: "2024-12-09", lines: ["My Status: still slightly hyper", "lookalikes: 84–98% normal"] },
+  { start: "2026-06-26", end: "2026-08-03", lines: ["After the relapse:", "My Status: slightly hyper again", "lookalikes: 84–90% normal"] },
+  // Not in the notebook: added once Oct 26 was relabelled hypothyroid.
+  { start: "2026-10-26", end: "2026-10-26", lines: ["My Status: hypo", "lookalikes: 84% normal"] },
+];
 
 // UCSD lab reference ranges.
 const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
@@ -21,6 +32,8 @@ const LABS = ["TSH", "FT4", "T3"];
 const LAB_COLORS = { TSH: BLUE, FT4: ORANGE, T3: INK2 };
 const LAB_NAMES = { TSH: "TSH", FT4: "Free T4", T3: "Total T3" };
 const UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "total, ng/mL" };
+// Shorter names keep the hover readout compact.
+const SHORT_NAMES = { TSH: "TSH", FT4: "FT4", T3: "T3" };
 const HOVER_UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "ng/mL" };
 
 const parseDate = d3.utcParse("%Y-%m-%d");
@@ -67,6 +80,9 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   // View state, kept across re-renders: the current view, the clicked marker's date,
   // the draw whose journal entry is open, and the zoomed time range (null shows everything).
   let mode = "raw", pinned = null, opened = null, zoom = null;
+  // The open callout (an index into CALLOUTS), and the callouts already opened, which stop pulsing.
+  let openCallout = null;
+  const seenCallouts = new Set();
 
   // Journal panel: the entry written closest to a draw, within 3 days of it.
   const fmtLong = d3.utcFormat("%B %d, %Y");
@@ -113,7 +129,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
 
     // Layout: dose, lab panel(s), status strip (same height ratios as the notebook), lookalikes strip.
     const width = 1000;
-    const margin = { top: 8, right: overlay ? 100 : 16, bottom: 70, left: 110 };
+    const margin = { top: 8, right: overlay ? 100 : 16, bottom: 76, left: 110 };
     const gap = 14;
     const ratios = [1.3, ...panelLabs.map(() => overlay ? 6.5 : 2), 0.45, 1.6];
     const unit = 62;
@@ -121,7 +137,10 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
     const last = heights.length - 1;
     // Extra room under the lab panels for the note about open circles and green bands.
     const noteH = 22;
-    const tops = heights.map((_, i) => margin.top + d3.sum(heights.slice(0, i)) + gap * i + (i >= last - 1 ? noteH : 0));
+    // And between the two strips, for the callout buttons.
+    const calloutH = 16;
+    const tops = heights.map((_, i) => margin.top + d3.sum(heights.slice(0, i)) + gap * i
+      + (i >= last - 1 ? noteH : 0) + (i === last ? calloutH : 0));
     const height = tops[last] + heights[last] + margin.bottom;
     const innerW = width - margin.left - margin.right;
 
@@ -291,21 +310,18 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       xAxis.selectAll(".tick text").append("tspan")
         .attr("x", 0).attr("dy", "1.2em").text(d => d3.utcFormat("%Y")(d));
 
-      // One legend for both strips: the lookalikes' hyper / normal / hypo use the matching status colors.
-      const keys = Object.keys(STATUS_COLORS);
-      const itemW = 130;
-      const legend = g.append("g").attr("class", "legend")
-        .attr("transform", `translate(${(innerW - keys.length * itemW) / 2},${h + 46})`);
-      const item = legend.selectAll("g").data(keys).join("g")
-        .attr("transform", (_, i) => `translate(${i * itemW},0)`);
-      item.append("rect").attr("width", 12).attr("height", 12).attr("rx", 2)
-        .attr("fill", k => STATUS_COLORS[k]).attr("fill-opacity", 0.75);
-      item.append("text").attr("x", 18).attr("y", 6).attr("dy", "0.35em").text(k => k.replace("_", " "));
+      // Footnote for the lookalikes strip, where the legend used to be.
+      const foot = g.append("text").attr("class", "chart-note").attr("y", h + 50);
+      foot.append("tspan").attr("font-weight", 600).attr("fill", INK).text("** Lookalikes: ");
+      foot.append("tspan").text(`What the ${K} Kaggle patients with the closest TSH and T3 were diagnosed with. Their clinicians also had T4, symptoms`);
+      foot.append("tspan").attr("x", 0).attr("dy", "1.4em")
+        .text("and treatment history, so this can differ from My Status, which only compares my labs to the UCSD reference ranges.");
     }
 
     // Hover: a vertical line through every panel at the cursor. Click to leave a marker there.
     const readout = d3.select("#dose-readout");
-    const hint = "Hover to compare draws; click a data point to read the journal; drag to zoom";
+    d3.select("#dose-hint").text("Hover over data points to view detailed information. Click to drop a point-in-time marker. "
+      + "Select and drag a range to zoom in. Click a pulsating + to view diagnosis differences between My Status and the lookalikes.");
     const fmtDate = d3.utcFormat("%b %d, %Y");
     const guide = (dash, width) => tops.map((t, i) => root.append("line")
       .attr("y1", t).attr("y2", t + heights[i])
@@ -325,15 +341,15 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       const vals = LABS.map(lab => {
         const r = series[lab].find(v => v.draw_id === d.id);
         if (!r) return `${LAB_NAMES[lab]} –`;
-        return `${LAB_NAMES[lab]} ${r.censored ? "<0.01" : d3.format("~g")(r.value)} ${HOVER_UNITS[lab]}`;
+        return `${SHORT_NAMES[lab]} ${r.censored ? "<0.01" : d3.format("~g")(r.value)} ${HOVER_UNITS[lab]}`;
       });
       const dose = d.dose_mg === null ? "n/a" : `${d3.format("~g")(d.dose_mg)} mg/day`;
       const look = lookalikes.find(l => +l.start === +d.date);
       const lookText = look
         ? LOOKALIKE_GROUPS.filter(grp => look[grp] > 0).map(grp => `${d3.format(".0%")(look[grp])} ${grp}`).join(", ")
-        : "n/a (no T3 that day)";
-      return `<strong>${fmtDate(d.date)}</strong> &nbsp; ${dose} &nbsp; ${d.status.replace("_", " ")}<br>${vals.join(" &nbsp; ")}`
-        + `<br>${K} closest Kaggle patients: ${lookText}`;
+        : "n/a (no T3)";
+      return `<strong>${fmtDate(d.date)}</strong> · ${dose} · ${d.status.replace("_", " ")}<br>${vals.join(" · ")}`
+        + `<br>Lookalikes: ${lookText}`;
     };
 
     const showPinned = () => {
@@ -341,7 +357,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       markers.forEach(l => l.attr("x1", x(pinned)).attr("x2", x(pinned))
         .style("visibility", onScreen ? "visible" : "hidden"));
       if (onScreen) readout.html(describe(nearestDraw(pinned)));
-      else readout.text(hint);
+      else readout.text("");
       d3.select("#dose-reset").property("disabled", !zoom && !pinned);
     };
     showPinned();
@@ -406,6 +422,59 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
         vlines.forEach(l => l.style("visibility", "hidden"));
         showPinned();
       });
+
+    // Callout buttons in the gap between the strips, drawn above the hover area so they take the click.
+    // Opening one outlines its stretch across both strips and shows the note above it.
+    const stripTop = tops[last - 1], stripBottom = tops[last] + heights[last];
+    const callouts = CALLOUTS.map((c, i) => {
+      const endSpan = lookalikes.find(l => +l.start === +parseDate(c.end));
+      const x0 = x(parseDate(c.start)), x1 = x(endSpan.end || xEnd);
+      return { ...c, i, x0, x1, cx: (x0 + x1) / 2 };
+    }).filter(c => c.cx >= 0 && c.cx <= innerW);
+
+    const open = callouts.find(c => c.i === openCallout);
+    if (open) {
+      const layer = root.append("g").attr("pointer-events", "none");
+      layer.append("rect").call(clip)
+        .attr("x", open.x0).attr("width", open.x1 - open.x0)
+        .attr("y", stripTop - 3).attr("height", stripBottom - stripTop + 6).attr("rx", 3)
+        .attr("fill", "none").attr("stroke", INK).attr("stroke-width", 1.5);
+      const box = layer.append("g");
+      const text = box.append("text").attr("class", "callout-text").attr("y", 18);
+      open.lines.forEach((line, j) => text.append("tspan").attr("x", 10).attr("dy", j ? "1.3em" : 0).text(line));
+      const w = text.node().getBBox().width + 20, boxH = open.lines.length * 15.6 + 12;
+      // To the left of the stretch, centred on the two strips. It may cover the row labels while open;
+      // it only moves to the right of the stretch if even the label column has no room.
+      const minLeft = 4 - margin.left;
+      const left = open.x0 - 10 - w >= minLeft ? open.x0 - 10 - w : Math.min(innerW - w, open.x1 + 10);
+      box.attr("transform", `translate(${left},${(stripTop + stripBottom - boxH) / 2})`);
+      box.insert("rect", "text").attr("width", w).attr("height", boxH).attr("rx", 4)
+        .attr("fill", SURFACE).attr("stroke", INK2).attr("stroke-width", 0.8);
+    }
+
+    const toggleCallout = c => {
+      openCallout = openCallout === c.i ? null : c.i;
+      seenCallouts.add(c.i);
+      render();
+    };
+    const button = root.append("g").selectAll("g").data(callouts).join("g")
+      .attr("class", "callout-button")
+      .attr("transform", c => `translate(${c.cx},${tops[last] - (gap + calloutH) / 2})`)
+      .attr("role", "button").attr("tabindex", 0)
+      .attr("aria-label", c => `${c.i === openCallout ? "Hide" : "Show"} note: ${c.lines.join(", ")}`)
+      .style("cursor", "pointer")
+      .on("click", (_, c) => toggleCallout(c))
+      .on("keydown", (event, c) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        toggleCallout(c);
+      });
+    // A soft ring pulses around buttons that haven't been opened yet.
+    button.filter(c => !seenCallouts.has(c.i)).append("circle").attr("class", "callout-pulse")
+      .attr("r", 7).attr("fill", CALLOUT_GREY);
+    button.append("circle").attr("r", 7).attr("fill", CALLOUT_GREY).attr("stroke", SURFACE).attr("stroke-width", 1.5);
+    button.append("text").attr("class", "callout-sign").attr("dy", "0.35em").attr("text-anchor", "middle")
+      .text(c => c.i === openCallout ? "−" : "+");
   }
 
   // All biomarkers: one small chart per test on a shared time axis, in a fixed order
@@ -601,7 +670,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
 
     const readout = d3.select("#dose-readout");
     const fmtDate = d3.utcFormat("%b %d, %Y");
-    const allHint = "Hover to see every result from the nearest test date; click to leave a marker; drag to zoom";
+    d3.select("#dose-hint").text("Hover to see every result from the nearest test date. Click to drop a point-in-time marker. Select and drag a range to zoom in.");
     const nearest = t => dates[d3.minIndex(dates, d => Math.abs(d - t))];
     const snap = px => nearest(x.invert(px));
 
@@ -623,7 +692,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       if (pinned) showDay(nearest(pinned));
       else {
         hoverLabels.forEach(l => l.text(""));
-        readout.text(allHint);
+        readout.text("");
       }
       d3.select("#dose-reset").property("disabled", !allZoom && !pinned);
     }

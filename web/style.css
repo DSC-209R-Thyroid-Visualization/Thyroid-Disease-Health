@@ -26,9 +26,101 @@ main {
   gap: 24px;
 }
 
+.page-header {
+  position: relative;
+  min-height: 96px;
+  margin-bottom: 12px;
+}
+
+/* Right edge lines up with the time series: the chart is the width left after the side column
+   (260px + 24px gap), and its plot ends 16/1000 of the chart width from the right. */
+.page-icon {
+  position: absolute;
+  top: 0;
+  right: calc(284px + (100% - 284px) * 0.016);
+  cursor: help;
+  outline: none;
+}
+
+.page-icon img {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.page-icon:hover img,
+.page-icon:focus-visible img {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.page-icon:focus-visible {
+  outline: 2px solid var(--ink2);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Hover (or keyboard focus) shows the note to the right of the image. */
+.icon-tip {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 14px);
+  z-index: 10;
+  width: 280px;
+  padding: 10px 12px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.icon-tip strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.icon-tip-fact {
+  display: block;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.page-icon:hover .icon-tip,
+.page-icon:focus-within .icon-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-icon img,
+  .icon-tip {
+    transition: none;
+  }
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--ink2);
+  font-size: 16px;
+}
+
 h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -88,11 +180,41 @@ h2 {
   cursor: default;
 }
 
-.readout {
+/* The title sits on its own line; the hint box has a fixed width after the buttons. */
+.controls {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.controls h2 {
+  flex-basis: 100%;
+  margin-bottom: 10px;
+}
+
+.controls .toggle {
+  margin-top: 0;
+}
+
+.hint {
+  flex: 0 0 auto;
+  width: 640px;
+  margin-left: 12px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  padding: 4px 10px;
   color: var(--ink2);
   font-size: 12px;
-  text-align: right;
   line-height: 1.5;
+}
+
+.readout {
+  max-width: 300px;
+  color: var(--ink2);
+  font-size: 11px;
+  text-align: right;
+  line-height: 1.4;
   min-height: 36px;
   font-variant-numeric: tabular-nums;
 }
@@ -220,7 +342,7 @@ h2 {
 }
 
 .status-key {
-  margin: auto 0 60px;
+  margin: auto 0 30px;
   padding-left: 21px;
   font-size: 11px;
   line-height: 1.35;
@@ -230,10 +352,6 @@ h2 {
 .status-key dt {
   color: var(--ink);
   font-weight: 600;
-}
-
-.status-key .key-break {
-  margin-top: 12px;
 }
 
 .status-key dd {
@@ -247,4 +365,42 @@ h2 {
   margin-right: 6px;
   border-radius: 2px;
   opacity: 0.75;
+}
+
+.callout-text {
+  fill: var(--ink);
+  font-size: 12px;
+}
+
+.callout-sign {
+  fill: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.callout-button:focus {
+  outline: none;
+}
+
+.callout-button:focus-visible circle:not(.callout-pulse) {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* A soft ring that grows and fades around callout buttons not opened yet. */
+.callout-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: callout-pulse 2.2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes callout-pulse {
+  from { transform: scale(1); opacity: 0.45; }
+  to { transform: scale(2.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout-pulse { animation: none; opacity: 0.2; transform: scale(1.6); }
 }

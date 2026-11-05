@@ -3,16 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Thyroid labs vs. methimazole dose</title>
+  <title>Chasing the Butterfly</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body>
   <main>
+    <header class="page-header">
+      <div>
+        <h1>Chasing the Butterfly</h1>
+        <p class="subtitle">One patient's path through Graves' treatment, draw by draw</p>
+      </div>
+      <div class="page-icon" tabindex="0" aria-describedby="icon-tip">
+        <img src="thyroid_icon.png" alt="Drawing of a thyroid gland" width="76" height="96">
+        <div id="icon-tip" class="icon-tip" role="tooltip">
+          <strong>Why "the butterfly"?</strong>
+          The thyroid has two lobes, one on each side of the windpipe, joined by a thin bridge called the isthmus.
+          Spread across the front of the neck, they look like a butterfly's wings.
+          <span class="icon-tip-fact">It weighs only about 20 grams, yet its hormones set the pace of nearly every cell in the body.</span>
+        </div>
+      </div>
+    </header>
     <section id="dose-response">
       <div class="chart-header">
-        <div>
+        <div class="controls">
           <h2 id="dose-title">Thyroid labs vs. methimazole dose (raw)</h2>
           <div id="dose-view" class="toggle" role="group" aria-label="View">
             <button type="button" value="raw" class="active">Raw</button>
@@ -21,9 +36,10 @@
             <button type="button" value="all">All Markers</button>
           </div>
           <button type="button" id="dose-reset" class="reset" disabled>Reset</button>
+          <span id="dose-hint" class="hint"></span>
           <select id="marker-group" class="group-select" aria-label="Marker group" style="display: none"></select>
         </div>
-        <div id="dose-readout" class="readout">Hover to compare draws; click a data point to read the journal; drag to zoom</div>
+        <div id="dose-readout" class="readout"></div>
       </div>
       <div class="chart-row">
         <div id="dose-chart"></div>
@@ -42,10 +58,6 @@
             <dd>TSH above range, Free T4 and T3 in range</dd>
             <dt><span class="swatch" style="background: #2a78d6"></span>hypothyroid</dt>
             <dd>Free T4 or T3 below range</dd>
-            <dt class="key-break">** Lookalikes</dt>
-            <dd>What the 50 Kaggle patients with the closest TSH and T3 were diagnosed with. Their
-              clinicians also had T4, symptoms and treatment history, so this can differ from My Status,
-              which only compares my labs to the UCSD reference ranges.</dd>
           </dl>
         </div>
       </div>
