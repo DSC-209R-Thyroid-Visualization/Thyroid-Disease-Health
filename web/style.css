@@ -34,10 +34,17 @@ main {
 
 /* Right edge lines up with the time series: the chart is the width left after the side column
    (260px + 24px gap), and its plot ends 16/1000 of the chart width from the right. */
-.page-icon {
+.page-icons {
   position: absolute;
   top: 0;
   right: calc(284px + (100% - 284px) * 0.016);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.page-icon {
+  position: relative;
   cursor: help;
   outline: none;
 }
@@ -77,6 +84,13 @@ main {
   visibility: hidden;
   transform: translateX(-6px);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+/* The pill bottle's note opens to its left instead. */
+.icon-tip.icon-tip-left {
+  left: auto;
+  right: calc(100% + 14px);
+  transform: translateX(6px);
 }
 
 .icon-tip strong {
