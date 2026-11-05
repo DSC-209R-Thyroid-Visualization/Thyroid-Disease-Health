@@ -14,6 +14,10 @@
       <div>
         <h1>Chasing the Butterfly</h1>
         <p class="subtitle">One patient's path through Graves' treatment, draw by draw</p>
+        <button type="button" id="story-play" class="story-play" aria-haspopup="dialog" aria-controls="story">
+          <span class="story-play-icon" aria-hidden="true"></span>
+          Press play to read my journey
+        </button>
       </div>
       <div class="page-icons">
         <div class="page-icon" tabindex="0" aria-describedby="med-tip">
@@ -31,6 +35,11 @@
             The thyroid has two lobes, one on each side of the windpipe, joined by a thin bridge called the isthmus.
             Spread across the front of the neck, they look like a butterfly's wings.
             <span class="icon-tip-fact">It weighs only about 20 grams, yet its hormones set the pace of nearly every cell in the body.</span>
+            <strong class="icon-tip-section">Too high, or too low?</strong>
+            Graves' disease makes the thyroid overactive (hyper); Hashimoto's makes it underactive (hypo).
+            Either way, staying out of range for long takes a toll: too high strains the heart and bones,
+            too low brings fatigue, weight gain and high cholesterol. Treatment is a balancing act,
+            and too much methimazole can tip Graves' into hypo.
           </div>
         </div>
       </div>
@@ -46,8 +55,8 @@
             <button type="button" value="all">All Markers</button>
           </div>
           <button type="button" id="dose-reset" class="reset" disabled>Reset</button>
-          <span id="dose-hint" class="hint"></span>
           <select id="marker-group" class="group-select" aria-label="Marker group" style="display: none"></select>
+          <span id="dose-hint" class="hint"></span>
         </div>
         <div id="dose-readout" class="readout"></div>
       </div>
@@ -73,6 +82,19 @@
       </div>
     </section>
   </main>
+  <div id="story" class="story" role="dialog" aria-modal="true" aria-label="My journey" hidden>
+    <button type="button" class="story-close" aria-label="Close">&times;</button>
+    <div class="story-text">
+      <p>In 2017 I began experiencing heart palpitations on a regular basis. My doctor at the time had me checked out for heart-related issues, which all came back negative&hellip;</p>
+      <p>Believing that I was just experiencing anxiety, I continued with heart palpitations for another 7 years, believing I was being dramatic&hellip;</p>
+      <p>After I began losing weight and experiencing an increase in palpitations and hair loss, I decided to see a new primary care physician, who decided to test me for thyroid-related conditions, given that my mom has Hashimoto's disease&hellip;</p>
+      <p>I came back as positive for hyperthyroidism, and my antibodies returned positive for Graves' disease.</p>
+      <p>Now, under specialized care, I have been on the road to recovery and to better understand my body and how interventions are affecting me.</p>
+      <p>This is my data and this is my journey. </p>
+    </div>
+    <p class="story-hint">Click to skip ahead &middot; Esc to close</p>
+  </div>
+  <script src="story.js"></script>
   <script src="dose_response.js"></script>
 </body>
 </html>
