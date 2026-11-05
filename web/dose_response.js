@@ -122,6 +122,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   function render() {
     d3.selectAll("#dose-view button").classed("active", function () { return this.value === mode; });
     d3.select("#side").style("display", mode === "all" ? "none" : null);
+    d3.select("#writeup").style("display", mode === "all" ? "none" : null);
     d3.select("#marker-group").style("display", mode === "all" ? null : "none");
     d3.select(".chart-header").classed("all-mode", mode === "all");
     if (mode === "all") return renderAll();

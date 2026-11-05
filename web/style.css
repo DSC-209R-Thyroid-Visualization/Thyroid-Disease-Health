@@ -391,6 +391,26 @@ h2 {
   white-space: nowrap;
 }
 
+/* Write-up under the chart (hidden in All Markers), as wide as the chart (page minus the side column). */
+.writeup {
+  max-width: calc(100% - 284px);
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--muted);
+}
+
+.writeup h2 {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.writeup p {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
 .chart-note {
   fill: var(--ink2);
   font-size: 12px;
