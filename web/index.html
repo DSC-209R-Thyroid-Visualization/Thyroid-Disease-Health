@@ -83,9 +83,65 @@
     </section>
     <section id="writeup" class="writeup">
       <h2>Project Write-up</h2>
-      <p>Over the past 9 years I have undergone health complications that ultimately resulted in being diagnosed with Graves' disease, an autoimmune disease that attacks my thyroid. Over the past two and a half years I have undergone treatment with an endocrinologist who has been moderating my thyroid levels through methimazole. The visualization primarily focuses on my personal data, but includes diagnoses from the 50 patients in a Kaggle thyroid health dataset who were the closest to my TSH, Free T4, and T3 levels. The ability to visualize my data over time, aligned with my treatment allows me to contextualize events with my biomarkers and journal entries. This creates a meaningful tool as I continue through treatment.</p>
-      <p>The motivation for this project comes from UCSD Professor Emeritus Dr. Larry Smarr's "Future Patient" project, which used Dr. Smarr's time series biomarkers to create a visualization of his own health journey, which led to his diagnosis with Crones and Ulcerative Colitis. I found this project fascinating and inspiring, and I wanted to create something similar for myself, using my own data to track my progress. Similar to Future Patient, the visualization is broken into multiple parts, with a high level of interactivity that assists the user in understanding various events. </p>
-      <p>...</p>
+      <p>Over the past 9 years I have undergone health complications that ultimately resulted in being diagnosed 
+        with Graves' disease, an autoimmune disease that attacks my thyroid. Over the past two and a half years 
+        I have undergone treatment with an endocrinologist who has been moderating my thyroid levels through methimazole. 
+        The visualization primarily focuses on my personal data, but includes diagnoses from the 50 patients in a Kaggle 
+        thyroid health dataset who were the closest to my TSH and T3 levels to compare my diagnosis with a community of 
+        other patients. The ability to visualize my data over time, aligned with my treatment allows me to contextualize 
+        events with my biomarkers and journal entries. This creates a meaningful tool as I continue through treatment.</p>
+
+      <p>The motivation for this project comes from UCSD Professor Emeritus Dr. Larry Smarr's "Future Patient" 
+        project, which used Dr. Smarr's time series biomarkers to create a visualization of his own health journey. 
+        I found this project fascinating and inspiring, and I wanted to create something similar for myself, 
+        using my own data to track my progress. Similar to Future Patient, the visualization is broken into 
+        multiple parts, with a high level of interactivity that assists the user in understanding various events. </p>
+
+      <p>The title was chosen to be light and playful, referencing the thyroid as the 'Butterfly' organ, 
+        which it is often referred to as it is shaped like a butterfly across the front of the neck. The 
+        visualization contains several different interactive features including hover, click, drag to zoom, 
+        and guided callouts. Pressing play under the title tells my story leading up to diagnosis, and hovering 
+        over the pill bottle and thyroid icons gives background on methimazole and on the thyroid itself. In 
+        the main chart, hovering over a data point shows that draw's dose, results, status, and lookalikes. 
+        Clicking a data point opens my journal entry from that time and drops a marker; and dragging across a 
+        stretch of time zooms in. Reset returning to the full view. The Raw, Normalized, and Overlay buttons 
+        switch between each lab's own units, each lab rescaled to its reference range, and all three labs on 
+        one shared axis. Beneath the labs, the My Status strip compares each draw to the UCSD reference ranges, 
+        while the Lookalikes strip shows what the 50 closest Kaggle patients were diagnosed with, and the 
+        pulsing '+' buttons between them highlight where the two disagree. The last tab, 'All Markers' shows 
+        every lab test in my records back to 2017, filterable by body system, placing my thyroid journey in 
+        the context of the rest of my health.</p>
+
+      <p>With this visualization, value is gained from the core tools that we have developed. 
+        Patient portals such as MyChart provide access to laboratory results and basic trend charts,
+        but they offer limited functionality for understanding relationships between different biomarkers 
+        over long periods of time. Considering the body is a holistic, interconnected system, I am interested
+        in understanding how my thyroid and treatment may or may not influence other biomarker groups. For instance, 
+        methimazole is known to affect liver functions in some patients, making it valuable to compare my thyroid 
+        biomarkers with liver results on a shared timeline. When the user hovers over the time series chart 
+        they are immediately presented with a line that remains consistent across the linked graphs. If the 
+        user clicks, then they can drop a marker that appears as a dashed line across the charts. This dashed 
+        line will persist through zoom functionality as well as through selecting other chart views or biomarker 
+        groupings. It's a highly beneficial tool in maintaining a view over a specific point in time. </p>
+
+      <p>Beyond the analytical tools, many of the interactive features were designed to support storytelling 
+        and provide personal reflection. Having a chronic illness generally disconnects your personal story from 
+        your raw data. By integrating my biomarkers, treatment history, journal entries, and diagnostics 
+        into a single visualization, the project transforms those disconnected events into a coherent narrative. 
+        Features such as the 'playt button' story mode, contextual annotations, and personal journal entries provide 
+        the human perspective behind the data, helpind to explain not only what changed over time, but what those 
+      experiences meant to me at different stages of treatment. </p>
+
+      <p>As a group we each formulated different ideas and the group liked the personal angle of a personal health 
+        journey visualization. We each generated different prototypes, primarily by sharing jupyter notebooks over a 
+        shared project repo in GitHub. The outcome ended up being a vote to combine of several ideas. The first being 
+        a view of my most pulled thyroid levels, the second being to integrate the 50 closest Kaggle dataset patients 
+        to understand how my diagnosis compares to a larger community, the third was to expand my biomarker set to view 
+        how thyroid may or may not interact with other biomarker catagories. We all contributed to various data 
+        transformations and various tool ideas. 
+      </p>
+
+      <p>In the future, I plan to continue updating and maintaining this to further understand my body.</p>
     </section>
   </main>
   <div id="story" class="story" role="dialog" aria-modal="true" aria-label="My journey" hidden>
@@ -93,7 +149,7 @@
     <div class="story-text">
       <p>In 2017 I began experiencing heart palpitations on a regular basis. My doctor at the time had me checked out for heart-related issues, which all came back negative&hellip;</p>
       <p>Believing that I was just experiencing anxiety, I continued with heart palpitations for another 7 years&hellip;</p>
-      <p>After I began losing weight and experiencing an increase in palpitations and hair loss, I decided to see a new primary care physician, who decided to test me for thyroid-related conditions, given that my mom has Hashimoto's disease&hellip;</p>
+      <p>After I began losing weight, having hand tremors, experiencing an increase in palpitations, and hair loss, I decided to see a new primary care physician, who decided to test me for thyroid-related conditions, given that my mom has Hashimoto's disease&hellip;</p>
       <p>I came back as positive for hyperthyroidism, and my antibodies returned positive for Graves' disease.</p>
       <p>Now, under specialized care, I have been on the road to recovery and to better understand my body and how interventions are affecting me.</p>
       <p>This is my data and this is my journey. </p>
