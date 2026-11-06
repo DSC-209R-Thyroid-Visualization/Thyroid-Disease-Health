@@ -526,7 +526,8 @@ h2 {
 
 .panel-label {
   fill: var(--ink2);
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .legend text {
@@ -622,4 +623,16 @@ h2 {
 
 @media (prefers-reduced-motion: reduce) {
   .callout-pulse { animation: none; opacity: 0.2; transform: scale(1.6); }
+}
+
+@media (max-width: 1100px) {
+  .page-icons {
+    position: static;
+    margin-top: 12px;
+  }
+
+  .page-header {
+    display: flex;
+    flex-direction: column;
+  }
 }

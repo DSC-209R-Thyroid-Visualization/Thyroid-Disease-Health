@@ -116,7 +116,13 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   render();
   d3.selectAll("#dose-view button").on("click", function () { mode = this.value; render(); });
   // Reset clears the zoom, the marker and the journal panel but keeps the current view.
-  d3.select("#dose-reset").on("click", () => { zoom = null; allZoom = null; pinned = null; showJournal(null); render(); });
+  d3.select("#dose-reset").on("click", () => { 
+    zoom = null; 
+    allZoom = null; 
+    pinned = null; 
+    showJournal(null); 
+    render(); 
+  });
 
   // Rebuilds the whole chart, since overlay has one lab panel instead of three.
   function render() {
