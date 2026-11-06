@@ -1,7 +1,7 @@
 // Thyroid labs vs. methimazole dose (raw / normalized / overlay views), ported from jpolizzi/dose_response_prototype.ipynb.
 // Colors and reference ranges match the notebook.
 
-const BLUE = "#2a78d6", ORANGE = "#eb6834";
+const BLUE = "#2a78d6", ORANGE = "#eb6834", VIOLET = "#7656D6", TEAL = "#168aad", PLUM = "#C04A8B";
 const SURFACE = "#fcfcfb", INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#a3a29c";
 const REF_GREEN = "#39FF14";
 // Callout buttons: a mid grey, light enough not to read as black but dark enough for the white +.
@@ -29,7 +29,7 @@ const CALLOUTS = [
 // UCSD lab reference ranges.
 const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
 const LABS = ["TSH", "FT4", "T3"];
-const LAB_COLORS = { TSH: BLUE, FT4: ORANGE, T3: INK2 };
+const LAB_COLORS = { TSH: VIOLET, FT4: TEAL, T3: PLUM };
 const LAB_NAMES = { TSH: "TSH", FT4: "Free T4", T3: "Total T3" };
 const UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "total, ng/mL" };
 // Shorter names keep the hover readout compact.
@@ -180,7 +180,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
         .attr("fill", BLUE).attr("fill-opacity", 0.12)
         .attr("d", d3.area().curve(d3.curveStepAfter).x(d => x(d[0])).y0(h).y1(d => y(d[1])));
       g.append("path").datum(pts).call(clip)
-        .attr("fill", "none").attr("stroke", BLUE).attr("stroke-width", 2)
+        .attr("fill", "none").attr("stroke", BLUE).attr("stroke-width", 2.5)
         .attr("d", d3.line().curve(d3.curveStepAfter).x(d => x(d[0])).y(d => y(d[1])));
       g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(3));
       g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
@@ -227,7 +227,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       group.forEach(lab => {
         const s = series[lab];
         g.append("path").datum(s).call(clip)
-          .attr("fill", "none").attr("stroke", LAB_COLORS[lab]).attr("stroke-width", 2)
+          .attr("fill", "none").attr("stroke", LAB_COLORS[lab]).attr("stroke-width", 3.0)
           .attr("d", d3.line().x(d => x(d.date)).y(d => y(value(d))));
         g.append("g").call(clip).selectAll("circle").data(s).join("circle")
           .attr("cx", d => x(d.date)).attr("cy", d => y(value(d))).attr("r", 4.5)
@@ -245,12 +245,26 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       panelLabel(g, h, label);
 
       if (overlay) {
-        const item = g.append("g").attr("class", "legend").attr("transform", `translate(${innerW + 16},10)`)
-          .selectAll("g").data(LABS).join("g")
+        const item = g.append("g")
+          .attr("class", "legend")
+          .attr("transform", `translate(${innerW + 16},0)`)
+          .selectAll("g")
+          .data(LABS)
+          .join("g")
           .attr("transform", (_, j) => `translate(0,${j * 20})`);
-        item.append("line").attr("x2", 18).attr("y1", 6).attr("y2", 6)
-          .attr("stroke", lab => LAB_COLORS[lab]).attr("stroke-width", 2);
-        item.append("text").attr("x", 24).attr("y", 6).attr("dy", "0.35em").text(lab => LAB_NAMES[lab]);
+
+        item.append("line")
+          .attr("x2", 18)
+          .attr("y1", 6)
+          .attr("y2", 6)
+          .attr("stroke", lab => LAB_COLORS[lab])
+          .attr("stroke-width", 3);
+
+        item.append("text")
+          .attr("x", 24)
+          .attr("y", 6)
+          .attr("dy", "0.35em")
+          .text(lab => LAB_NAMES[lab]);
       }
     });
 
