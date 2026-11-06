@@ -11,7 +11,7 @@ body {
   color: var(--ink);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
-  zoom: 1.07;
+  zoom: 1.0;
 }
 
 main {
