@@ -6,7 +6,7 @@
 (() => {
   const SURFACE = "#fcfcfb";
   const DOSE_COLOR = "#2a78d6";
-  const LAB_COLORS = { TSH: "#7656D6", T3: "#C04A8B" };
+  const LAB_COLORS = { TSH: "#7656D6", FT4: "#168aad", T3: "#C04A8B" };
   const STATUS_COLORS = {
     hyperthyroid: "#e34948", subclinical_hyper: "#eda100", euthyroid: "#1baf7a",
     subclinical_hypo: "#6250d6", hypothyroid: "#2a78d6",
@@ -59,6 +59,7 @@
     const rows = [
       { key: "dose", h: 64, label: ["Methimazole", "(mg/day)"] },
       { key: "TSH", h: 118, label: ["TSH", "(mIU/L)"] },
+      { key: "FT4", h: 104, label: ["Free T4", "(ng/dL)"] },
       { key: "T3", h: 104, label: ["Total T3", "(ng/mL)"] },
       { key: "status", h: 26, label: ["My status"] },
     ];
@@ -69,14 +70,16 @@
     const innerW = width - margin.left - margin.right;
     const xEnd = new Date(+cards.at(-1).date + 45 * DAY);
     const x = d3.scaleUtc().domain([new Date(+cards[0].date - 20 * DAY), xEnd]).range([0, innerW]);
-    const yDose = d3.scaleLinear().domain([0, 12]).range([rows[0].h, 0]);
-    const yTsh = d3.scaleLog().domain([0.006, 8]).range([rows[1].h, 0]).clamp(true);
-    const yT3 = d3.scaleLinear().domain([0, 4.6]).range([rows[2].h, 0]);
+    const rowH = k => rows.find(r => r.key === k).h;
+    const yDose = d3.scaleLinear().domain([0, 12]).range([rowH("dose"), 0]);
+    const yTsh = d3.scaleLog().domain([0.006, 8]).range([rowH("TSH"), 0]).clamp(true);
+    const yFt4 = d3.scaleLinear().domain([0, 3.6]).range([rowH("FT4"), 0]);
+    const yT3 = d3.scaleLinear().domain([0, 4.6]).range([rowH("T3"), 0]);
 
     const svg = d3.select("#fc-timeline").append("svg")
       .attr("viewBox", [0, 0, width, height])
       .attr("role", "img")
-      .attr("aria-label", "Timeline of methimazole dose, TSH, T3 and status for each blood draw. Click a draw to open its card.");
+      .attr("aria-label", "Timeline of methimazole dose, TSH, Free T4, T3 and status for each blood draw. Click a draw to open its card.");
     const root = svg.append("g").attr("transform", `translate(${margin.left},0)`);
     const row = k => root.append("g").attr("transform", `translate(0,${rows.find(r => r.key === k).top})`);
 
@@ -95,7 +98,7 @@
     gDose.append("path").datum(doseLine).attr("fill", "none").attr("stroke", DOSE_COLOR).attr("stroke-width", 2)
       .attr("d", d3.line().x(d => x(d[0])).y(d => yDose(d[1])));
 
-    // TSH and T3, each with its reference band.
+    // TSH, Free T4 and T3, each with its reference band.
     const labRow = (lab, y, ticks, fmt) => {
       const g = row(lab), [lo, hi] = REF[lab];
       g.append("rect").attr("x", 0).attr("width", innerW).attr("y", y(hi)).attr("height", y(lo) - y(hi))
@@ -110,6 +113,7 @@
         .call(s => s.append("title").text(d => `Blood test ${d.card.i + 1}: ${fmtShort(d.card.date)}`));
     };
     const tshDots = labRow("TSH", yTsh, [0.01, 0.1, 1, 4], v => v === 0.01 ? "<0.01" : d3.format("~g")(v));
+    const ft4Dots = labRow("FT4", yFt4, [0, 1, 2, 3], d3.format("~g"));
     const t3Dots = labRow("T3", yT3, [0, 1, 2, 3, 4], d3.format("~g"));
 
     // Status strip: each draw's status runs until the next draw.
@@ -117,16 +121,16 @@
     const segs = gStatus.selectAll("g").data(cards).join("g").attr("class", "fc-seg").on("click", (_, c) => go(c.i));
     const segEnd = c => x(c.i < cards.length - 1 ? cards[c.i + 1].date : xEnd);
     segs.append("rect").attr("x", c => x(c.date)).attr("width", c => Math.max(1, segEnd(c) - x(c.date)))
-      .attr("y", 0).attr("height", rows[3].h).attr("stroke", SURFACE).attr("stroke-width", 1);
+      .attr("y", 0).attr("height", rows.at(-1).h).attr("stroke", SURFACE).attr("stroke-width", 1);
     segs.append("title").text(c => `Blood test ${c.i + 1}: ${fmtShort(c.date)}`);
 
     const xAxis = root.append("g").attr("class", "fc-axis fc-x")
-      .attr("transform", `translate(0,${rows[3].top + rows[3].h + 6})`)
+      .attr("transform", `translate(0,${rows.at(-1).top + rows.at(-1).h + 6})`)
       .call(d3.axisBottom(x).ticks(d3.utcMonth.every(6)).tickFormat(d3.utcFormat("%b %Y")).tickSize(0));
     xAxis.select(".domain").remove();
 
     const marker = root.append("line").attr("class", "fc-marker")
-      .attr("y1", rows[0].top - 2).attr("y2", rows[3].top + rows[3].h + 2);
+      .attr("y1", rows[0].top - 2).attr("y2", rows.at(-1).top + rows.at(-1).h + 2);
 
     // ---------- card ----------
     const card = d3.select("#fc-card-body");
@@ -196,8 +200,8 @@
     }
 
     function updateTimeline() {
-      [tshDots, t3Dots].forEach((dots, k) => dots
-        .attr("fill", [LAB_COLORS.TSH, LAB_COLORS.T3][k])
+      [[tshDots, "TSH"], [ft4Dots, "FT4"], [t3Dots, "T3"]].forEach(([dots, lab]) => dots
+        .attr("fill", LAB_COLORS[lab])
         .attr("stroke", SURFACE).attr("stroke-width", 1.5)
         .attr("r", d => d.card.i === current ? 7.5 : 5));
       segs.select("rect").attr("fill", c => STATUS_COLORS[c.status])
