@@ -45,15 +45,38 @@
         </div>
       </div>
     </header>
+    <section id="flashcards" class="flashcards" tabindex="-1">
+      <h2 class="fc-title">Could I tell how my thyroid was doing just by how I felt?</h2>
+      <p class="fc-intro">Graves' disease makes the thyroid overactive. A daily pill, methimazole, holds it back, and a blood
+        test every few months shows whether the dose is right. Click any test on the timeline to read what I wrote in my
+        journal that day next to what my labs said.</p>
+      <div class="fc-row">
+        <div class="fc-timeline-wrap">
+          <p class="fc-help">Each dot is one blood test. Click a dot or the status strip to open that test's card.</p>
+          <div id="fc-timeline"></div>
+          <p class="fc-help">Status compares each test to the UCSD reference ranges. "Labs like mine": the 50 patients in a Kaggle
+            thyroid dataset closest to my TSH and T3 (distance on log TSH and T3, each scaled by its spread).</p>
+        </div>
+        <div class="fc-side">
+          <div id="fc-card-body" class="fc-card" aria-live="polite"></div>
+          <div class="fc-nav">
+            <button type="button" id="fc-prev" class="reset">&larr; Previous</button>
+            <span id="fc-count" class="fc-count"></span>
+            <button type="button" id="fc-next" class="reset">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
     <section id="dose-response">
+      <h2 class="section-title">Beyond the thyroid: every lab since 2017</h2>
+      <p class="fc-intro">An overactive thyroid speeds up the whole body, so other labs can shift with it. These four
+        changed while mine was overactive. Pick another group, or all 73 tests, from the menu.</p>
       <div class="chart-header">
         <div class="controls">
-          <h2 id="dose-title">Thyroid labs vs. methimazole dose (raw)</h2>
-          <div id="dose-view" class="toggle" role="group" aria-label="View">
-            <button type="button" value="raw" class="active">Raw</button>
-            <button type="button" value="normalized">Normalized</button>
-            <button type="button" value="overlay">Overlay</button>
-            <button type="button" value="all">All Markers</button>
+          <h2 id="dose-title">Thyroid labs vs. methimazole dose</h2>
+          <!-- Only All Markers is used now; the thyroid views moved into the flashcards above. -->
+          <div id="dose-view" class="toggle" role="group" aria-label="View" hidden>
+            <button type="button" value="all" class="active">All Markers</button>
           </div>
           <button type="button" id="dose-reset" class="reset" disabled>Reset</button>
           <select id="marker-group" class="group-select" aria-label="Marker group" style="display: none"></select>
@@ -105,7 +128,7 @@
         over the pill bottle and thyroid icons gives background on methimazole and on the thyroid itself. In 
         the main chart, hovering over a data point shows that draw's dose, results, status, and lookalikes. 
         Clicking a data point opens my journal entry from that time and drops a marker; and dragging across a 
-        stretch of time zooms in. Reset returning to the full view. The Raw, Normalized, and Overlay buttons 
+        stretch of time zooms in. Reset returns to the full view. The Raw, Normalized, and Overlay buttons 
         switch between each lab's own units, each lab rescaled to its reference range, and all three labs on 
         one shared axis. Beneath the labs, the My Status strip compares each draw to the UCSD reference ranges, 
         while the Lookalikes strip shows what the 50 closest Kaggle patients were diagnosed with, and the 
@@ -129,22 +152,27 @@
         and provide personal reflection. Having a chronic illness generally disconnects your personal story from 
         your raw data. By integrating my biomarkers, treatment history, journal entries, and diagnostics 
         into a single visualization, the project transforms those disconnected events into a coherent narrative. 
-        Features such as the 'playt button' story mode, contextual annotations, and personal journal entries provide 
-        the human perspective behind the data, helpind to explain not only what changed over time, but what those 
+        Features such as the 'play button' story mode, contextual annotations, and personal journal entries provide 
+        the human perspective behind the data, helping to explain not only what changed over time, but what those 
       experiences meant to me at different stages of treatment. </p>
 
       <p>As a group we each formulated different ideas and the group liked the personal angle of a personal health 
         journey visualization. We each generated different prototypes, primarily by sharing jupyter notebooks over a 
-        shared project repo in GitHub. The outcome ended up being a vote to combine of several ideas. The first being 
+        shared project repo in GitHub. The outcome ended up being a vote to combine several ideas. The first being 
         a view of my most pulled thyroid levels, the second being to integrate the 50 closest Kaggle dataset patients 
         to understand how my diagnosis compares to a larger community, the third was to expand my biomarker set to view 
-        how thyroid may or may not interact with other biomarker catagories. We all contributed to various data 
+        how thyroid may or may not interact with other biomarker categories. We all contributed to various data 
         transformations and various tool ideas. 
       </p>
 
       <p>In the future, I plan to continue updating and maintaining this to further understand my body.</p>
     </section>
   </main>
+  <footer class="page-footer">
+    <p>Data: my own lab results and journal (2017–2026), and the
+      <a href="https://www.kaggle.com/datasets/emmanuelfwerr/thyroid-disease-data">Thyroid Disease Data</a> set on Kaggle.
+      Source code: <a href="https://github.com/DSC-209R-Thyroid-Visualization/Thyroid-Disease-Health">GitHub</a>.</p>
+  </footer>
   <div id="story" class="story" role="dialog" aria-modal="true" aria-label="My journey" hidden>
     <button type="button" class="story-close" aria-label="Close">&times;</button>
     <div class="story-text">
@@ -159,5 +187,6 @@
   </div>
   <script src="story.js"></script>
   <script src="dose_response.js"></script>
+  <script src="flashcards.js"></script>
 </body>
 </html>
