@@ -636,3 +636,407 @@ h2 {
     flex-direction: column;
   }
 }
+
+/* Chart subtitle: how the current view transforms the data. */
+.chart-subtitle {
+  flex-basis: 100%;
+  margin: -4px 0 10px;
+  color: var(--ink2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Footer. */
+.page-footer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+  color: var(--ink2);
+  font-size: 12px;
+}
+
+.page-footer a {
+  color: var(--ink);
+}
+
+/* The readout keeps its width whether or not it has text, so hovering never reflows the
+   controls and moves the chart under the cursor. */
+.chart-header:not(.all-mode) .readout {
+  flex: 0 0 300px;
+}
+
+/* Narrow screens: stack the side column under the chart, and let the timeline scroll
+   sideways inside its own box instead of shrinking until it can't be read. */
+@media (max-width: 900px) {
+  .page-header {
+    min-height: 0;
+  }
+
+  .page-icons {
+    position: static;
+    margin-top: 12px;
+  }
+
+  /* Icon notes open below the icons so they stay on screen. */
+  .icon-tip,
+  .icon-tip.icon-tip-left {
+    top: calc(100% + 8px);
+    left: 0;
+    right: auto;
+    width: min(250px, calc(100vw - 160px));
+    transform: none;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chart-header:not(.all-mode) .readout {
+    flex: none;
+    max-width: none;
+    text-align: left;
+  }
+
+  .hint {
+    flex: 1 1 100%;
+    width: auto;
+    margin: 8px 0 0;
+  }
+
+  .chart-row {
+    flex-direction: column;
+  }
+
+  #dose-chart {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  #dose-chart svg {
+    min-width: 760px;
+  }
+
+  .side {
+    flex: none;
+    width: 100%;
+  }
+
+  .journal {
+    margin-top: 16px;
+  }
+
+  .status-key {
+    margin: 16px 0 0;
+  }
+
+  .writeup {
+    max-width: none;
+    margin-left: 0;
+  }
+
+}
+
+/* Flashcards (flashcards.js): one card per blood draw, guess then flip. */
+.flashcards {
+  margin-bottom: 48px;
+}
+
+.flashcards:focus {
+  outline: none;
+}
+
+.fc-title {
+  margin: 8px 0 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.fc-intro {
+  max-width: 760px;
+  margin: 0 0 20px;
+  color: var(--ink2);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.fc-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.fc-timeline-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#fc-timeline svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fc-help {
+  margin: 0 0 8px;
+  color: var(--ink2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.fc-axis-label {
+  fill: var(--ink2);
+  font-size: 12px;
+}
+
+.fc-axis text {
+  fill: var(--ink2);
+  font-size: 11px;
+}
+
+.fc-axis .domain {
+  display: none;
+}
+
+.fc-axis .tick line {
+  stroke: #e8e6e1;
+}
+
+.fc-x text {
+  font-size: 11px;
+}
+
+.fc-dot,
+.fc-seg {
+  cursor: pointer;
+}
+
+
+.fc-seg.current rect {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.fc-marker {
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
+.fc-side {
+  flex: 0 0 360px;
+  margin-top: 90px;
+}
+
+.fc-card {
+  padding: 22px 22px 18px;
+  border: 1px solid #e2ded5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(30, 28, 24, 0.07);
+}
+
+
+
+.fc-date {
+  margin: 0 0 4px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+}
+
+.fc-dose {
+  margin: 0 0 18px;
+  color: var(--ink2);
+  font-size: 13px;
+}
+
+.fc-label {
+  margin: 0 0 6px;
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fc-quote {
+  margin: 0 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.fc-quote::before {
+  content: "\201C";
+}
+
+.fc-quote::after {
+  content: "\201D";
+}
+
+
+
+
+
+.fc-link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.fc-link {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+
+
+.fc-badge {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.fc-why {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fc-gauges {
+  display: grid;
+  gap: 10px;
+}
+
+.fc-gauge-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.fc-gauge-val {
+  color: var(--ink2);
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: #ece9e2;
+}
+
+.fc-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: #1baf7a;
+  opacity: 0.45;
+}
+
+.fc-value {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.fc-value.out {
+  background: #e34948;
+}
+
+.fc-note {
+  margin: 6px 0 14px;
+  color: var(--ink2);
+  font-size: 11px;
+}
+
+.fc-kaggle {
+  display: flex;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.fc-kaggle span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.fc-count {
+  color: var(--ink2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+}
+
+/* Phones and narrow windows: stack the cards under the timeline. */
+@media (max-width: 900px) {
+  .icon-caption {
+    position: static;
+    margin-top: 4px;
+    transform: none;
+    text-align: left;
+  }
+
+  .fc-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* The timeline scrolls sideways in its own box rather than shrinking past readable. */
+  #fc-timeline {
+    overflow-x: auto;
+  }
+
+  #fc-timeline svg {
+    min-width: 640px;
+  }
+
+  .fc-side {
+    flex: none;
+    width: 100%;
+  }
+}
+
+/* Only All Markers is used now, so its view toggle stays hidden. */
+#dose-view[hidden] {
+  display: none;
+}

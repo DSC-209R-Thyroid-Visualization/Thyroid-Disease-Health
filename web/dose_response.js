@@ -128,7 +128,6 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   function render() {
     d3.selectAll("#dose-view button").classed("active", function () { return this.value === mode; });
     d3.select("#side").style("display", mode === "all" ? "none" : null);
-    d3.select("#writeup").style("display", mode === "all" ? "none" : null);
     d3.select("#marker-group").style("display", mode === "all" ? null : "none");
     d3.select(".chart-header").classed("all-mode", mode === "all");
     if (mode === "all") return renderAll();
@@ -523,23 +522,35 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   };
   const fmtValue = d => `${d.censor || ""}${d3.format("~g")(d.value)}`;
 
-  // Group dropdown for the All Markers view (thyroid included, listed first).
-  let group = "All";
+  // Group dropdown for the All Markers view (thyroid included, listed first). It opens on a short list of
+  // labs that changed while my thyroid was overactive, so the first view isn't all 73 tests at once.
+  const HIGHLIGHT = "Highlights";
+  const HIGHLIGHT_TESTS = ["Cholesterol", "LDL-Chol (Calc)", "Alkaline Phosphatase", "Creatinine"];
+  const groupTitle = g => g === HIGHLIGHT ? "Labs that changed while my thyroid was overactive"
+    : g === "All" ? "All biomarkers over time" : `${g} over time`;
+  let group = HIGHLIGHT;
   // All Markers has its own zoom: it covers 2017 on, while the other views start at the first thyroid draw.
   let allZoom = null;
   d3.select("#marker-group").selectAll("option")
-    .data(["All", ...new Set(tests.map(t => t.group))]).join("option")
-    .attr("value", d => d).text(d => d === "All" ? "All groups" : d);
+    .data([HIGHLIGHT, "All", ...new Set(tests.map(t => t.group))]).join("option")
+    .attr("value", d => d).text(d => d === HIGHLIGHT ? "Labs that changed" : d === "All" ? "All groups" : d);
+  d3.select("#marker-group").property("value", group);
   d3.select("#marker-group").on("change", function () { group = this.value; render(); });
+  // The flashcards above now carry the thyroid story, so this section opens on every other lab (All Markers).
+  mode = "all";
+  render();
 
   function renderAll() {
     // Any single group other than Thyroid gets TSH, Free T4 and T3 as its first row, for comparison.
     const thyroid = group === "All" || group === "Thyroid" ? []
       : ["TSH", "Free T4", "T3 Total"].map(name => tests.find(t => t.test === name)).filter(Boolean);
-    const shown = [...thyroid, ...(group === "All" ? tests : tests.filter(t => t.group === group))];
+    const own = group === "All" ? tests
+      : group === HIGHLIGHT ? HIGHLIGHT_TESTS.map(name => tests.find(t => t.test === name)).filter(Boolean)
+      : tests.filter(t => t.group === group);
+    const shown = [...thyroid, ...own];
     // Hover snaps to the dates this group was actually tested.
     const dates = [...new Set(shown.flatMap(t => t.rows.map(d => +d.date)))].sort((a, b) => a - b).map(t => new Date(t));
-    d3.select("#dose-title").text(group === "All" ? "All biomarkers over time" : `${group} over time`);
+    d3.select("#dose-title").text(groupTitle(group));
 
     // A single group gets bigger charts, at most 4 across; "All groups" stays 5 across to fit everything.
     const width = 1300, cols = group === "All" ? 5 : 4, gapX = 22, gapY = 14, top = 30;
@@ -584,7 +595,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       const note = svg.append("text").attr("class", "panel-label")
         .attr("x", rowW + 28).attr("y", top + cellH / 2 - 8);
       note.append("tspan").attr("font-weight", 600).attr("fill", INK).text("Thyroid levels");
-      note.append("tspan").attr("x", rowW + 28).attr("dy", "1.4em").text(`shown alongside ${group.toLowerCase()} for comparison`);
+      note.append("tspan").attr("x", rowW + 28).attr("dy", "1.4em").text(group === HIGHLIGHT ? "in the top row, for comparison" : `shown alongside ${group.toLowerCase()} for comparison`);
     }
 
     const cells = svg.selectAll("g.cell").data(shown).join("g")
