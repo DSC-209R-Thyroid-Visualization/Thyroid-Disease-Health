@@ -417,6 +417,12 @@ h2 {
   white-space: nowrap;
 }
 
+/* The All Markers instructions fit on one line, so the box sizes to the text. */
+.chart-header.all-mode .hint {
+  width: auto;
+  white-space: nowrap;
+}
+
 /* Write-up under the chart (hidden in All Markers), as wide as the chart (page minus the side column). */
 .writeup {
   max-width: calc(100% - 284px);
@@ -703,10 +709,12 @@ h2 {
     text-align: left;
   }
 
-  .hint {
+  .hint,
+  .chart-header.all-mode .hint {
     flex: 1 1 100%;
     width: auto;
     margin: 8px 0 0;
+    white-space: normal;
   }
 
   .chart-row {
