@@ -438,6 +438,11 @@ h2 {
   line-height: 1.65;
 }
 
+.writeup h3 {
+  margin: 24px 0 8px;
+  font-size: 16px;
+}
+
 .chart-note {
   fill: var(--ink2);
   font-size: 12px;
@@ -960,8 +965,64 @@ h2 {
   background: var(--ink);
 }
 
-.fc-value.out {
+.fc-value.over {
   background: #e34948;
+}
+
+.fc-value.under {
+  background: #2a78d6;
+}
+
+/* Below the detection limit: the exact value isn't known, so the dot is hollow. */
+.fc-value.censored {
+  border: 2px solid currentColor;
+  background: #fff;
+  color: var(--ink);
+}
+
+.fc-value.censored.over {
+  color: #e34948;
+}
+
+.fc-value.censored.under {
+  color: #2a78d6;
+}
+
+.fc-badge.light {
+  color: var(--ink);
+}
+
+.fc-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 4px 0 10px;
+  color: var(--ink2);
+  font-size: 12px;
+}
+
+.fc-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-key i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.fc-key i.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.fc-key i.hollow {
+  border: 2px solid #e34948;
+  background: #fff;
 }
 
 .fc-note {

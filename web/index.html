@@ -54,6 +54,15 @@
         <div class="fc-timeline-wrap">
           <p class="fc-help">Each dot is one blood test. Click a dot or the status strip to open that test's card.</p>
           <div id="fc-timeline"></div>
+          <div class="fc-key" aria-label="Color key">
+            <span><i style="background:#e34948"></i>Overactive</span>
+            <span><i style="background:#f2a3a1"></i>Slightly overactive</span>
+            <span><i style="background:#1baf7a"></i>Normal</span>
+            <span><i style="background:#9cc1ef"></i>Slightly underactive</span>
+            <span><i style="background:#2a78d6"></i>Underactive</span>
+            <span><i class="dot" style="background:#4a4945"></i>In range</span>
+            <span><i class="dot hollow"></i>Below detection (&lt;0.01)</span>
+          </div>
           <p class="fc-help">Status compares each test to the UCSD reference ranges. "Labs like mine": the 50 patients in a Kaggle
             thyroid dataset closest to my TSH and T3 (distance on log TSH and T3, each scaled by its spread).</p>
         </div>
@@ -107,106 +116,75 @@
     </section>
     <section id="writeup" class="writeup">
       <h2>Project Write-up</h2>
-      <p>Over the past 9 years I have undergone health complications that ultimately resulted in being diagnosed 
-        with Graves' disease, an autoimmune disease that attacks my thyroid. Over the past two and a half years 
-        I have undergone treatment with an endocrinologist who has been moderating my thyroid levels through methimazole. 
-        The visualization primarily focuses on my personal data, but includes diagnoses from the 50 patients in a Kaggle 
-        thyroid health dataset who were the closest to my TSH and T3 levels to compare my diagnosis with a community of 
-        other patients. The ability to visualize my data over time, aligned with my treatment allows me to contextualize 
-        events with my biomarkers and journal entries. This creates a meaningful tool as I continue through treatment.</p>
+      <p>Over the past nine years, health complications led to my diagnosis with Graves' disease, an autoimmune disease that
+        attacks the thyroid. For the last two and a half years my endocrinologist has managed my thyroid with methimazole. This
+        visualization lines up my treatment, lab results and journal entries over time, and compares each blood draw with the
+        50 patients in a Kaggle thyroid dataset whose TSH and T3 were closest to mine.</p>
+      <p>The idea came from UCSD Professor Emeritus Dr. Larry Smarr's "Future Patient" project, where he visualized his own
+        biomarkers over time. I found it inspiring and wanted something similar for myself. Patient portals like MyChart show
+        lab results and basic charts, but make it hard to see how biomarkers relate to each other, to treatment, or to how I
+        actually felt. The body is one connected system, and methimazole is known to affect the liver in some patients, so it's
+        worth comparing my thyroid with my liver and other labs on one timeline.</p>
 
-      <p>The motivation for this project comes from UCSD Professor Emeritus Dr. Larry Smarr's "Future Patient" 
-        project, which used Dr. Smarr's time series biomarkers to create a visualization of his own health journey. 
-        I found this project fascinating and inspiring, and I wanted to create something similar for myself, 
-        using my own data to track my progress. Similar to Future Patient, the visualization is broken into 
-        multiple parts, with a high level of interactivity that assists the user in understanding various events. </p>
+      <h3>Design rationale</h3>
+      <p>The title refers to the thyroid's butterfly shape across the front of the neck, and the subtitle says the page follows
+        my treatment one blood draw at a time. The main question is "Could I tell how my thyroid was doing just by how I felt?"
+        Each of my 17 blood draws has a card that puts my journal entry from that day next to what my labs said, and the two
+        often disagree. In December 2024 I wrote "I feel back to normal" while my labs were still slightly overactive.</p>
+      <p>Showing this statically would mean lining up dates, finding the journal entry for each draw, and looking up the Kaggle
+        comparison by hand, and comparing my thyroid with dozens of other labs would be close to impossible. Interaction brings
+        it together and turns the page into something I can actually use at a doctor's visit. The play button under the title
+        tells my story up to diagnosis, and hovering over the pill bottle and thyroid icons explains methimazole and the
+        thyroid. In the main chart, clicking a dot or the status strip, or using Previous and Next, opens that draw's card:
+        date, dose, journal entry, lab results against their normal ranges, status, and the Kaggle comparison. A marker drops
+        across the dose, TSH, Free T4, T3 and status rows so the same moment is easy to find in each one.</p>
+      <p>The timeline shows dose as a step line, since a dose holds until it changes, and my labs as lines with markers, which
+        are familiar and easy to read. TSH is on a log scale because it moves across orders of magnitude. The mint green band
+        is the UCSD normal range for each lab. We kept color for thyroid status only, on a warm-to-cool scale: red for
+        overactive, since the body runs hot, blue for underactive, since it runs cold, lighter shades for "slightly," and green
+        for normal. Lines and dose are grey, so an out-of-range result shows up in the color of the status it points to. Hollow
+        dots are results below the detection limit.</p>
+      <p>The "Beyond the thyroid" section covers all 73 of my lab tests since 2017. It opens on four labs that changed while my
+        thyroid was overactive, next to my thyroid levels, and the menu shows any other group or all of them. Hovering shows the
+        nearest result on every chart at once, and clicking drops a marker that isn't tied to a blood draw. Since these span
+        nine years, dragging across a chart zooms in, the zoom stays when you switch groups, and Reset returns to the full
+        view. With this many charts the lines share one grey, and the green normal band is a bit stronger since the charts are
+        small. Out-of-range results on non-thyroid labs are a larger black dot, because high or low there says nothing about
+        the thyroid.</p>
+      <p>We tried several alternatives. Buttons switching between raw, normalized and overlay views were dropped for a single
+        page, since each view was really a static chart behind a button. An early linked timeline of dose and labs grew into the
+        timeline next to the cards. A TSH ridgeline against Kaggle groups was less intuitive than the cards, and a treatment
+        comparison of pills, radioactive iodine and surgery worked fine as a static chart. A separate view of draws where my
+        status disagreed with the Kaggle patients is now part of each card instead of its own interaction. Parallel sets on
+        tumor and goitre status were hard to fit into our story. Zoom on the main chart was distracting with only 17 draws, so
+        we kept it only in the lower charts, which go back to 2017.</p>
+      <p>For the data, each draw's status uses the UCSD reference ranges (TSH 0.27–4.2 mIU/L, Free T4 0.93–1.7 ng/dL, Total
+        T3 0.8–2.0 ng/mL). Overactive covers hyperthyroid and subclinical hyper, and underactive covers hypothyroid and
+        subclinical hypo. Kaggle diagnoses were grouped by the first letter of the target code (A–D hyperthyroid, E–H
+        hypothyroid, "-" normal), and other codes and ages over 100 were dropped. The closest 50 Kaggle patients are found by
+        Euclidean distance on log TSH and T3, each scaled by its standard deviation, with my T3 converted to nmol/L to match
+        Kaggle. Using 20 or 100 patients gives a similar pattern.</p>
+      <p>The design does hide a few things. A Kaggle label is one diagnosis per patient, made with T4, symptoms and history,
+        and those patients were referred for thyroid testing rather than drawn from the general public. My journal entries are
+        also inconsistent: some were written before a blood draw and some after I saw the results.</p>
 
-        <p>Patient portals such as MyChart provide access to laboratory results and basic time series charts,
-        but they offer limited functionality for understanding relationships between different biomarkers 
-        over long periods of time. Considering the body is an interconnected system, I am interested
-        in understanding how my thyroid and treatment may or may not influence other biomarker groups. For instance,
-        methimazole is known to affect liver functions in some patients, making it valuable to compare my thyroid 
-        biomarkers with liver results on a shared timeline. As the biomarker groups grow, interactivity is the most 
-        practical way to navigate the data. </p>
-
-      <p>The title was chosen to be light and playful, referencing the thyroid as the 'Butterfly' organ, 
-        which it is often referred to as it is shaped like a butterfly across the front of the neck. The subtitle 
-        was chosen as a way to convey that the visualizations are a time series through the treatment process. 
-        The title question "Could I tell how my thyroid was doing just by how I felt?" allows the user to 
-        understand that as they explore the visualization, they will be presented with information that connects to personal 
-        to a personal experience. </p>
-
-      <p>Presenting this information statically would be challenging. The user would need to time align the medical information 
-        and manually pull up a journal entry for each blood draw, and then compare the results of the blood draw with the kaggle 
-        data. Furthermore, its would be extremly difficult to compare my thyroid biomarkers to my other biomarkers within their 
-        classified groups. Interactivity allows for personal experience to connect with medical data while also providing some
-        tools that extend the project beyond visual storytelling and into a practical tool that can be used in patient visits.</p>
-
-        <p>The visualization contains several different interactive features including hover, click, drag to zoom, animation playback, flashcards,  
-        and guided callouts. Pressing play under the title tells my story leading up to diagnosis, and hovering 
-        over the pill bottle and thyroid icons gives background on methimazole and on the thyroid itself. 
-        In the main chart, clicking on a data point or pressing 'next' on the flashcard, shows that draw's date, treatment dose, 
-        lab results, status, journal entry, and a comparison to the kaggle dataset. Clicking a data point also drops a marker across the 
-        linked graphs, allowing that reference point to be easily identified across the graphs. Beneath the labs, the My Status strip 
-        shows what stage of thyroid disease I was in a particular pint in time. The explination of the color codings match inside the flashcard 
-        under the 'What my labs said' section. Scrolling down to the 'Beyond the thyroid' section allows the user to compare my thyroid data 
-        with all the other biomarkers that I have taken since 2017. Here the user can select a grouping of biomarkers from a drop down list. 
-        Comparisons can be made between the chosen group and the thyroid levels. The functionality is expanded in these charts. There is hover 
-        over that spans all graphs and when a marker is dropped, its not locked to a specific point. Since the time series is now expanded over 
-        9 years, the user can click and drag across a graph, to zoom in. The zoom level will persist as different groups of biomarkers 
-        are selected. The reset button can be used to reset the zoom level.</p>
-      
-        <p>Methimazole dose is represented by a step line, which shows the dose I was taking for a specified period of time. Blue was chosen as its 
-          color encoding because methimazole is intended to push the thyroid toward an underactive state. The line chart with markers was chosen for 
-          the blood draw time series data because it is easy to interpret and is universally understood. The background of each chart has a mint green 
-          section, which represents the "normal" range for the biomarker according to UCSD Health. The dot and line colors were chosen to look appealing, 
-          while being distinguishable from one another. The 'My Status' uses a diverging color pallette, with green as the midpoint. 
-          As the stages become closer to hyper thyroid, the colors diverge towards red, and as the stages become closer to hypo thyroid, the colors diverge
-          towards blue. In the "Beyond the Thyroid" section the colors are unified across the line plots since there are so many that can be displayed. The green 
-          normal range color is further amplified since the charts are smaller and can be more difficult to read.  
-        </p>
-
-        <p>Alternatives were explored that used buttons to switch between multiple views. However, we decided that a single page design would be more effective 
-          for user experience. An early design also used a linked timeline view combining medication dosage and laboratory results, which eventually evolved 
-          into the timeline displayed alongside the flashcards. We experimented with a TSH ridgeline visualization to compare my results with Kaggle patient 
-          groups, but it was less intuitive than using the flashcards. We also considered a treatment comparison view showing outcomes for medication, 
-          radioactive iodine, and surgery; however, because the comparison could be communicated effectively with a simple static chart it was removed. 
-          The main biomarker charts originally included zoom functionality, but this feature became distracting and was removed. Zooming was retained in 
-          the smaller laboratory charts because they span a much longer time period, with some non-thyroid related results dating back to 2017. Another discarded 
-          feature allowed users to examine cases where my diagnosis differed from similar Kaggle patients. This information is now integrated directly into each 
-          flashcard rather than requiring a separate interaction. We also explored an interactive visualization to understand tumor and goitre status, but it was 
-          difficult to integrate into our final concept. </p>
-
-        <p> Various data transformations were completed for this assignment. The status of each draw is binned to the UCSD reference
-          range (TSH 0.27–4.2 mIU/L, Free T4 0.93–1.7 ng/dL,Total T3 0.8–2.0 ng/mL). Overactive covers hyperthyroid and subclinical hyper; underactive covers 
-          hypothyroid and subclinical hypo. The kaggle diagnosis groups use a target range where A-D represents a person in a hyperthyroid stat, and E-H 
-          represents a patient in a hypothyroid stats. In the kaggle dataset a person in a normal state is represented by a '-'. Some data cleaning was complete 
-          to drop unrelated codes and ages over 100. To determine the Lookalikes the Euclidean distance on [log10 TSH, T3], each scaled by its
-          standard deviation and limited to the nearest 50 patients. Kaggle measures T3 in nmol/L, therefore my T3 was converted to identify lookalikes. </p>
-        
-        <p>The design obscures a couple items that need addressing. A Kaggle label is one diagnosis per patient, made with T4, symptoms, and history. Furthermore, Kaggle patients 
-          were referred for thyroid testing, not the generaly public. Another important obscurity is taht my journal entries are inconsistent. Sometimes I would enter my journal 
-          entry before my blood testing, and sometimes after I received the results.
-        </p>
-
-      <p>As a group we each formulated different ideas and the group liked the personal angle of a personal health 
-        journey visualization. We each generated different prototypes, primarily by sharing jupyter notebooks over a 
-        shared project repo in GitHub. The outcome ended up being a vote to combine several ideas. The first being 
-        a view of my most pulled thyroid levels, the second being to integrate the 50 closest Kaggle dataset patients 
-        to understand how my diagnosis compares to a larger community, the third was to expand my biomarker set to view 
-        how thyroid may or may not interact with other biomarker categories. We all contributed to various data 
-        transformations and various tool ideas. 
-      </p>
-
-      <p> Joel: personal data collection and cleaning, scripts, prototypes 1, 2, 5, the first D3 page, story overlay, journal, All Markers, GitHub Pages workflow, write-up. </br>
-      Hours: 8-10</p>
-      <p>Priyanka: prototypes 3 and 4, the lookalike method, the flashcard redesign, testing at laptop and phone sizes. </br>
-      Hours: TODO</p>
-      <p>Sanjana: TODO </br>
-      Hours: TODO</p>
-      <p>What took the most time: Deciding the color encodings for the divergent color scheme and deciding if the line and scatter plot should be a unified color or differentiable from one another.</p>
-
-      <p>In the future, I plan to continue updating and maintaining this to further understand my body.</p>
+      <h3>Development process</h3>
+      <p>We each came up with different ideas, and the group liked the angle of a personal health journey. Each of us built
+        prototypes in Jupyter notebooks in our shared GitHub repo, then we voted to combine three ideas: my thyroid levels over
+        time, the 50 closest Kaggle patients to see how my diagnosis compares to a larger group, and my wider biomarker history
+        to see how the thyroid may or may not affect other labs. We all contributed to the data transformations and to ideas
+        for the tool.</p>
+      <p>Joel: personal data collection and cleaning, scripts, prototypes 1, 2 and 5, the first D3 page, story overlay,
+        journal, "Beyond the thyroid", GitHub Pages workflow, write-up.<br>
+        Hours: 8–10</p>
+      <p>Priyanka: prototypes 3 and 4, the lookalike method, the first lookalikes panel, the flashcard redesign, the color
+        scheme and key, the four-lab default in "Beyond the thyroid".<br>
+        Hours: 7–8</p>
+      <p>Sanjana: TODO<br>
+        Hours: TODO</p>
+      <p>What took the most time: choosing the colors, especially deciding whether the lines should share one color or each
+        have their own.</p>
+      <p>I plan to keep updating this to better understand my body.</p>
     </section>
   </main>
   <footer class="page-footer">

@@ -3,14 +3,17 @@
 
 const BLUE = "#2a78d6", ORANGE = "#eb6834", VIOLET = "#7656D6", TEAL = "#168aad", PLUM = "#C04A8B", PLUM2 = "#c04a5a";
 const SURFACE = "#fcfcfb", INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#a3a29c";
-const REF_GREEN = "#39FF14";
+// Same soft green as the flashcards, so "normal range" looks the same everywhere.
+const REF_GREEN = "#1baf7a";
+// Lines and the methimazole shading are grey; red and blue are kept for thyroid status only.
+const LINE_GREY = "#b9b6ae", DOT_GREY = "#4a4945", DOSE_GREY = "#6f6d67";
 // Callout buttons: a mid grey, light enough not to read as black but dark enough for the white +.
 const CALLOUT_GREY = "#7a7973";
 const STATUS_COLORS = {
   hyperthyroid: "#e34948",
-  subclinical_hyper: "#eda100",
+  subclinical_hyper: "#f2a3a1",
   euthyroid: "#1baf7a",
-  subclinical_hypo: "#6250d6",
+  subclinical_hypo: "#9cc1ef",
   hypothyroid: "#2a78d6",
 };
 // Kaggle diagnosis groups for the lookalikes strip (same hues as the matching statuses).
@@ -29,7 +32,9 @@ const CALLOUTS = [
 // UCSD lab reference ranges.
 const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
 const LABS = ["TSH", "FT4", "T3"];
-const LAB_COLORS = { TSH: VIOLET, FT4: PLUM, T3: PLUM2 };
+const LAB_COLORS = { TSH: VIOLET, FT4: PLUM, T3: PLUM2 };  // only used by the old timeline views, no longer shown
+// Thyroid tests in All Markers: which way a high result points. TSH rises when the thyroid is underactive.
+const THYROID_DIRECTION = { "TSH": "inverse", "Free T4": "direct", "T3 Total": "direct" };
 const LAB_NAMES = { TSH: "TSH", FT4: "Free T4", T3: "Total T3" };
 const UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "total, ng/mL" };
 // Shorter names keep the hover readout compact.
@@ -577,21 +582,24 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       .attr("aria-label", "Every lab test over time, one small chart per test");
     // Every chart has the same plot size, so one clip path serves them all.
     svg.append("clipPath").attr("id", "all-clip").append("rect").attr("width", plotW).attr("height", plotH);
+    // Lines and dots get a few pixels of room above and below, so a dot on the edge isn't cut in half.
+    svg.append("clipPath").attr("id", "all-clip-marks").append("rect")
+      .attr("y", -6).attr("width", plotW).attr("height", plotH + 12);
 
     // Key for the shading.
     const key = svg.append("g").attr("class", "legend").attr("transform", "translate(0,6)");
-    key.append("rect").attr("width", 14).attr("height", 12).attr("fill", BLUE).attr("fill-opacity", 0.12);
+    key.append("rect").attr("width", 14).attr("height", 12).attr("fill", DOSE_GREY).attr("fill-opacity", 0.14);
     key.append("text").attr("x", 20).attr("y", 6).attr("dy", "0.35em").text("on methimazole");
-    key.append("rect").attr("x", 130).attr("width", 14).attr("height", 12).attr("fill", REF_GREEN).attr("fill-opacity", 0.3);
+    key.append("rect").attr("x", 130).attr("width", 14).attr("height", 12).attr("fill", REF_GREEN).attr("fill-opacity", 0.16);
     key.append("text").attr("x", 150).attr("y", 6).attr("dy", "0.35em").text("reference range");
-    key.append("circle").attr("cx", 272).attr("cy", 6).attr("r", 4).attr("fill", SURFACE).attr("stroke", BLUE).attr("stroke-width", 1.5);
+    key.append("circle").attr("cx", 272).attr("cy", 6).attr("r", 4).attr("fill", SURFACE).attr("stroke", DOT_GREY).attr("stroke-width", 1.5);
     key.append("text").attr("x", 282).attr("y", 6).attr("dy", "0.35em").text("reported as a limit (e.g. >60)");
 
     // Outlined box around the thyroid comparison row, labelled in the empty space beside it.
     if (thyroid.length) {
       const rowW = thyroid.length * cellW + (thyroid.length - 1) * gapX;
       svg.append("rect").attr("x", -8).attr("y", top - 6).attr("width", rowW + 16).attr("height", cellH + 10)
-        .attr("rx", 6).attr("fill", "none").attr("stroke", "#e6c440").attr("stroke-width", 1.5);  // soft yellow outline
+        .attr("rx", 6).attr("fill", "none").attr("stroke", MUTED).attr("stroke-width", 1.5);  // grey outline: color is kept for thyroid status
       const note = svg.append("text").attr("class", "panel-label")
         .attr("x", rowW + 28).attr("y", top + cellH / 2 - 8);
       note.append("tspan").attr("font-weight", 600).attr("fill", INK).text("Thyroid levels");
@@ -626,22 +634,30 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       const plot = g.append("g").attr("clip-path", "url(#all-clip)");
       plot.selectAll("rect.dose").data(onDose).join("rect").attr("class", "dose")
         .attr("x", d => x(d.start)).attr("width", d => x(d.end) - x(d.start))
-        .attr("height", plotH).attr("fill", BLUE).attr("fill-opacity", 0.12);
+        .attr("height", plotH).attr("fill", DOSE_GREY).attr("fill-opacity", 0.14);
       if (ref) {
         g.append("rect").attr("width", plotW)
           .attr("y", y(Math.min(ref.hi, y.domain()[1]))).attr("height", y(Math.max(ref.lo, y.domain()[0])) - y(Math.min(ref.hi, y.domain()[1])))
-          .attr("fill", REF_GREEN).attr("fill-opacity", 0.3);
+          .attr("fill", REF_GREEN).attr("fill-opacity", 0.16);
       }
       g.append("g").attr("class", "grid").call(d3.axisLeft(y).ticks(3).tickSize(-plotW).tickFormat(""));
       // Lines and points go in a second clipped group so they draw above the band and grid.
-      const marks = g.append("g").attr("clip-path", "url(#all-clip)");
+      const marks = g.append("g").attr("clip-path", "url(#all-clip-marks)");
       marks.append("path").datum(t.rows)
-        .attr("fill", "none").attr("stroke", BLUE).attr("stroke-width", 2)
+        .attr("fill", "none").attr("stroke", LINE_GREY).attr("stroke-width", 2)
         .attr("d", d3.line().x(d => x(d.date)).y(d => y(d.value)));
+      // In-range results: small grey dots. Out of range: red or blue on the thyroid tests (the status they
+      // point to), a larger black dot on every other test, where high or low says nothing about the thyroid.
+      const dotColor = d => {
+        if (d.hi === null || (d.value >= d.lo && d.value <= d.hi)) return null;
+        const high = d.value > d.hi;
+        if (!(t.test in THYROID_DIRECTION)) return INK;
+        return (THYROID_DIRECTION[t.test] === "inverse" ? !high : high) ? STATUS_COLORS.hyperthyroid : STATUS_COLORS.hypothyroid;
+      };
       marks.selectAll("circle").data(t.rows).join("circle")
-        .attr("cx", d => x(d.date)).attr("cy", d => y(d.value)).attr("r", 3.5)
-        .attr("fill", d => d.censor ? SURFACE : BLUE)
-        .attr("stroke", d => d.censor ? BLUE : SURFACE).attr("stroke-width", 1.5);
+        .attr("cx", d => x(d.date)).attr("cy", d => y(d.value)).attr("r", d => dotColor(d) ? 3.2 : 2.3)
+        .attr("fill", d => d.censor ? SURFACE : dotColor(d) || DOT_GREY)
+        .attr("stroke", d => d.censor ? dotColor(d) || DOT_GREY : SURFACE).attr("stroke-width", d => d.censor ? 1.2 : 1);
       g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(3).tickFormat(v => d3.format(Math.abs(v) >= 1000 ? "~s" : "~g")(v)).tickSizeOuter(0));
       g.append("g").attr("class", "axis").attr("transform", `translate(0,${plotH})`)
         .call(xAxis.tickSizeOuter(0));

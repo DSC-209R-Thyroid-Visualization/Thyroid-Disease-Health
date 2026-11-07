@@ -5,12 +5,23 @@
 
 (() => {
   const SURFACE = "#fcfcfb";
-  const DOSE_COLOR = "#2a78d6";
-  const LAB_COLORS = { TSH: "#7656D6", FT4: "#168aad", T3: "#C04A8B" };
+  // Color only means thyroid status, on a warm-to-cool scale: red overactive (the body runs hot), blue
+  // underactive (it runs cold), lighter shades for "slightly", green normal. Everything else is grey.
+  const RED = "#e34948", BLUE = "#2a78d6", GREEN = "#1baf7a";
   const STATUS_COLORS = {
-    hyperthyroid: "#e34948", subclinical_hyper: "#eda100", euthyroid: "#1baf7a",
-    subclinical_hypo: "#6250d6", hypothyroid: "#2a78d6",
+    hyperthyroid: RED, subclinical_hyper: "#f2a3a1", euthyroid: GREEN,
+    subclinical_hypo: "#9cc1ef", hypothyroid: BLUE,
   };
+  const LIGHT_STATUS = new Set(["subclinical_hyper", "subclinical_hypo"]);  // take dark text
+  const DOSE_COLOR = "#6f6d67", LINE_GREY = "#b9b6ae", DOT_GREY = "#4a4945";
+  // Which way an out-of-range result points: TSH falls when the thyroid is overactive; T4 and T3 rise.
+  const direction = (lab, v) => {
+    const [lo, hi] = REF[lab];
+    if (v >= lo && v <= hi) return null;
+    const high = v > hi;
+    return (lab === "TSH" ? !high : high) ? "over" : "under";
+  };
+  const DIR_COLOR = { over: RED, under: BLUE };
   const KAGGLE_COLORS = { hyper: "#e34948", normal: "#1baf7a", hypo: "#2a78d6" };
   // UCSD reference ranges, same as the rest of the page.
   const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
@@ -105,8 +116,8 @@
         .attr("fill", STATUS_COLORS.euthyroid).attr("fill-opacity", 0.12);
       g.append("g").attr("class", "fc-axis").call(d3.axisLeft(y).tickValues(ticks).tickFormat(fmt).tickSize(-innerW));
       const pts = series(lab);
-      g.append("path").datum(pts).attr("fill", "none").attr("stroke", LAB_COLORS[lab]).attr("stroke-width", 2)
-        .attr("stroke-opacity", 0.55).attr("d", d3.line().x(d => x(d.card.date)).y(d => y(d.value)));
+      g.append("path").datum(pts).attr("fill", "none").attr("stroke", LINE_GREY).attr("stroke-width", 2)
+        .attr("d", d3.line().x(d => x(d.card.date)).y(d => y(d.value)));
       return g.append("g").selectAll("circle").data(pts).join("circle")
         .attr("class", "fc-dot").attr("cx", d => x(d.card.date)).attr("cy", d => y(d.value)).attr("r", 5)
         .on("click", (_, d) => go(d.card.i))
@@ -163,7 +174,8 @@
 
       const [label, why] = STATUS_TEXT[c.status];
       card.append("p").attr("class", "fc-label").text("What my labs said");
-      card.append("p").attr("class", "fc-badge").style("background", STATUS_COLORS[c.status]).text(label);
+      card.append("p").attr("class", "fc-badge").classed("light", LIGHT_STATUS.has(c.status))
+        .style("background", STATUS_COLORS[c.status]).text(label);
       card.append("p").attr("class", "fc-why").text(why);
       const gauges = card.append("div").attr("class", "fc-gauges");
       LAB_ROWS.forEach(r => gauge(gauges, r, c.labs[r.lab]));
@@ -195,17 +207,24 @@
       const [lo, hi] = REF[r.lab];
       const track = wrap.append("div").attr("class", "fc-track");
       track.append("span").attr("class", "fc-range").style("left", `${s(lo)}%`).style("width", `${s(hi) - s(lo)}%`);
-      const out = l.value < lo || l.value > hi;
-      track.append("span").attr("class", "fc-value").classed("out", out).style("left", `${s(l.value)}%`);
+      const dir = direction(r.lab, l.value);
+      track.append("span").attr("class", `fc-value${dir ? ` ${dir}` : ""}`).classed("censored", !!l.censored)
+        .style("left", `${s(l.value)}%`);
     }
 
     function updateTimeline() {
+      // In-range results are small grey dots; out-of-range ones take the color of the status they point to.
+      // Results below the detection limit (TSH <0.01) are hollow, since the exact value isn't known.
       [[tshDots, "TSH"], [ft4Dots, "FT4"], [t3Dots, "T3"]].forEach(([dots, lab]) => dots
-        .attr("fill", LAB_COLORS[lab])
-        .attr("stroke", SURFACE).attr("stroke-width", 1.5)
-        .attr("r", d => d.card.i === current ? 7.5 : 5));
+        .each(function (d) {
+          const dir = direction(lab, d.value), color = dir ? DIR_COLOR[dir] : DOT_GREY;
+          const r = (dir ? 5.5 : 4) + (d.card.i === current ? 2.5 : 0);
+          d3.select(this).attr("r", r)
+            .attr("fill", d.censored ? SURFACE : color)
+            .attr("stroke", d.censored ? color : SURFACE).attr("stroke-width", d.censored ? 2 : 1.5);
+        }));
       segs.select("rect").attr("fill", c => STATUS_COLORS[c.status])
-        .attr("fill-opacity", c => c.i === current ? 1 : 0.7);
+        .attr("fill-opacity", c => c.i === current ? 1 : 0.88);
       segs.classed("current", c => c.i === current);
       marker.attr("x1", x(cards[current].date)).attr("x2", x(cards[current].date));
     }
