@@ -1,7 +1,7 @@
 // Thyroid labs vs. methimazole dose (raw / normalized / overlay views), ported from jpolizzi/dose_response_prototype.ipynb.
 // Colors and reference ranges match the notebook.
 
-const BLUE = "#2a78d6", ORANGE = "#eb6834", VIOLET = "#7656D6", TEAL = "#168aad", PLUM = "#C04A8B";
+const BLUE = "#2a78d6", ORANGE = "#eb6834", VIOLET = "#7656D6", TEAL = "#168aad", PLUM = "#C04A8B", PLUM2 = "#c04a5a";
 const SURFACE = "#fcfcfb", INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#a3a29c";
 const REF_GREEN = "#39FF14";
 // Callout buttons: a mid grey, light enough not to read as black but dark enough for the white +.
@@ -29,7 +29,7 @@ const CALLOUTS = [
 // UCSD lab reference ranges.
 const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
 const LABS = ["TSH", "FT4", "T3"];
-const LAB_COLORS = { TSH: VIOLET, FT4: TEAL, T3: PLUM };
+const LAB_COLORS = { TSH: VIOLET, FT4: PLUM, T3: PLUM2 };
 const LAB_NAMES = { TSH: "TSH", FT4: "Free T4", T3: "Total T3" };
 const UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "total, ng/mL" };
 // Shorter names keep the hover readout compact.
