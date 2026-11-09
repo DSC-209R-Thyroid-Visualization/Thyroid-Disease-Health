@@ -80,38 +80,17 @@
       <h2 class="section-title">Beyond the thyroid: every lab since 2017</h2>
       <p class="fc-intro">An overactive thyroid speeds up the whole body, so other labs can shift with it. These four
         changed while mine was overactive. Pick another group, or all 73 tests, from the menu.</p>
-      <div class="chart-header">
+      <div class="chart-header all-mode">
         <div class="controls">
-          <h2 id="dose-title">Thyroid labs vs. methimazole dose</h2>
-          <!-- Only All Markers is used now; the thyroid views moved into the flashcards above. -->
-          <div id="dose-view" class="toggle" role="group" aria-label="View" hidden>
-            <button type="button" value="all" class="active">All Markers</button>
-          </div>
+          <h2 id="dose-title">Labs that changed while my thyroid was overactive</h2>
           <button type="button" id="dose-reset" class="reset" disabled>Reset</button>
-          <select id="marker-group" class="group-select" aria-label="Marker group" style="display: none"></select>
+          <select id="marker-group" class="group-select" aria-label="Marker group"></select>
           <span id="dose-hint" class="hint"></span>
         </div>
         <div id="dose-readout" class="readout"></div>
       </div>
       <div class="chart-row">
         <div id="dose-chart"></div>
-        <div id="side" class="side">
-          <aside id="journal" class="journal" aria-live="polite"></aside>
-          <dl class="status-key">
-            <dt>* My Status</dt>
-            <dd>Each draw compared to the UCSD reference ranges.</dd>
-            <dt><span class="swatch" style="background: #e34948"></span>hyperthyroid</dt>
-            <dd>Free T4 or T3 above range</dd>
-            <dt><span class="swatch" style="background: #eda100"></span>subclinical hyper</dt>
-            <dd>TSH below range, Free T4 and T3 in range</dd>
-            <dt><span class="swatch" style="background: #1baf7a"></span>euthyroid</dt>
-            <dd>TSH, Free T4 and T3 all in range</dd>
-            <dt><span class="swatch" style="background: #6250d6"></span>subclinical hypo</dt>
-            <dd>TSH above range, Free T4 and T3 in range</dd>
-            <dt><span class="swatch" style="background: #2a78d6"></span>hypothyroid</dt>
-            <dd>Free T4 or T3 below range</dd>
-          </dl>
-        </div>
       </div>
     </section>
     <section id="writeup" class="writeup">

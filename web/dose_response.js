@@ -1,507 +1,37 @@
-// Thyroid labs vs. methimazole dose (raw / normalized / overlay views), ported from jpolizzi/dose_response_prototype.ipynb.
-// Colors and reference ranges match the notebook.
+// "Beyond the thyroid": one small chart per lab test on a shared time axis, with the methimazole
+// periods shaded. The thyroid timeline and cards above it are drawn by flashcards.js.
 
-const BLUE = "#2a78d6", ORANGE = "#eb6834", VIOLET = "#7656D6", TEAL = "#168aad", PLUM = "#C04A8B", PLUM2 = "#c04a5a";
 const SURFACE = "#fcfcfb", INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#a3a29c";
 // Same soft green as the flashcards, so "normal range" looks the same everywhere.
 const REF_GREEN = "#1baf7a";
 // Lines and the methimazole shading are grey; red and blue are kept for thyroid status only.
 const LINE_GREY = "#b9b6ae", DOT_GREY = "#4a4945", DOSE_GREY = "#6f6d67";
-// Callout buttons: a mid grey, light enough not to read as black but dark enough for the white +.
-const CALLOUT_GREY = "#7a7973";
-const STATUS_COLORS = {
-  hyperthyroid: "#e34948",
-  subclinical_hyper: "#f2a3a1",
-  euthyroid: "#1baf7a",
-  subclinical_hypo: "#9cc1ef",
-  hypothyroid: "#2a78d6",
-};
-// Kaggle diagnosis groups for the lookalikes strip (same hues as the matching statuses).
-const LOOKALIKE_GROUPS = ["hyper", "normal", "hypo"];
-const LOOKALIKE_COLORS = { hyper: "#e34948", normal: "#1baf7a", hypo: "#2a78d6" };
-// Callouts from pnidadavolu/lookalikes_prototype.ipynb: stretches where My Status and the lookalikes
-// disagree most, from the first draw to the last draw in each stretch.
-const CALLOUTS = [
-  { start: "2024-05-20", end: "2024-05-20", lines: ["My Status: hypo", "lookalikes: 100% normal"] },
-  { start: "2024-08-07", end: "2024-12-09", lines: ["My Status: still slightly hyper", "lookalikes: 84–98% normal"] },
-  { start: "2026-06-26", end: "2026-08-03", lines: ["After the relapse:", "My Status: slightly hyper again", "lookalikes: 84–90% normal"] },
-  // Not in the notebook: added once Oct 26 was relabelled hypothyroid.
-  { start: "2026-10-26", end: "2026-10-26", lines: ["My Status: hypo", "lookalikes: 84% normal"] },
-];
-
-// UCSD lab reference ranges.
-const REF = { TSH: [0.27, 4.2], FT4: [0.93, 1.7], T3: [0.8, 2.0] };
-const LABS = ["TSH", "FT4", "T3"];
-const LAB_COLORS = { TSH: VIOLET, FT4: PLUM, T3: PLUM2 };  // only used by the old timeline views, no longer shown
-// Thyroid tests in All Markers: which way a high result points. TSH rises when the thyroid is underactive.
+// Out-of-range thyroid results take the color of the status they point to (same as the flashcards).
+const STATUS_COLORS = { hyperthyroid: "#e34948", hypothyroid: "#2a78d6" };
+// Thyroid tests: which way a high result points. TSH rises when the thyroid is underactive.
 const THYROID_DIRECTION = { "TSH": "inverse", "Free T4": "direct", "T3 Total": "direct" };
-const LAB_NAMES = { TSH: "TSH", FT4: "Free T4", T3: "Total T3" };
-const UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "total, ng/mL" };
-// Shorter names keep the hover readout compact.
-const SHORT_NAMES = { TSH: "TSH", FT4: "FT4", T3: "T3" };
-const HOVER_UNITS = { TSH: "mIU/L", FT4: "ng/dL", T3: "ng/mL" };
 
 const parseDate = d3.utcParse("%Y-%m-%d");
 const DAY = 24 * 60 * 60 * 1000;
 
-// The journal is optional: without it the chart still works, the panel just has nothing to show.
 Promise.all([
   d3.json("../data/processed/personal.json"),
-  d3.json("../data/journal.json").catch(() => ({})),
   d3.csv("../data/processed/all_labs.csv"),
-  d3.json("../data/processed/lookalikes.json"),
-]).then(([raw, journal, allLabs, lookalikes]) => draw(raw, journal, allLabs, lookalikes));
+]).then(([raw, allLabs]) => draw(raw, allLabs));
 
-function normalize(lab, v) {
-  let [lo, hi] = REF[lab];
-  if (lab === "TSH") [v, lo, hi] = [Math.log10(v), Math.log10(lo), Math.log10(hi)];
-  return (v - lo) / (hi - lo);
-}
-
-function draw(raw, journalEntries, allLabs, lookalikeData) {
+function draw(raw, allLabs) {
   const draws = raw.draws.map(d => ({ ...d, date: parseDate(d.date) }));
-  // journal.json maps a date (YYYY-MM-DD) to that day's entry.
-  const journal = Object.entries(journalEntries)
-    .map(([date, entry]) => ({ date: parseDate(date), entry })).filter(d => d.date && d.entry);
-  const labs = raw.labs.map(d => ({ ...d, date: parseDate(d.date) }));
-  const status = raw.status_spans.map(d => ({ ...d, start: parseDate(d.start), end: d.end && parseDate(d.end) }));
   const known = raw.dose_spans
     .filter(d => d.dose_mg !== null)
     .map(d => ({ ...d, start: parseDate(d.start), end: parseDate(d.end) }));
 
-  // Lookalikes (pnidadavolu/lookalikes_prototype.ipynb): for each draw with TSH and T3, the share of
-  // the closest Kaggle patients diagnosed hyper, normal or hypo, held until the next such draw.
-  const K = lookalikeData.k;
-  const lookalikes = lookalikeData.draws.map((d, i, all) => ({
-    ...d, start: parseDate(d.date), end: all[i + 1] ? parseDate(all[i + 1].date) : null,
-  }));
-  const series = Object.fromEntries(LABS.map(lab => [
-    lab, labs.filter(d => d.lab === lab).sort((a, b) => a.date - b.date),
-  ]));
-
-  const xMin = new Date(d3.min(draws, d => d.date) - 20 * DAY);
-  const xEnd = new Date(+d3.max(draws, d => d.date) + 45 * DAY);
-
-  // View state, kept across re-renders: the current view, the clicked marker's date,
-  // the draw whose journal entry is open, and the zoomed time range (null shows everything).
-  let mode = "raw", pinned = null, opened = null, zoom = null;
-  // The open callout (an index into CALLOUTS), and the callouts already opened, which stop pulsing.
-  let openCallout = null;
-  const seenCallouts = new Set();
-
-  // Journal panel: the entry written closest to a draw, within 3 days of it.
-  const fmtLong = d3.utcFormat("%B %d, %Y");
-  const entryFor = d => {
-    const near = journal.filter(j => Math.abs(j.date - d.date) <= 3 * DAY);
-    return near.length ? near[d3.minIndex(near, j => Math.abs(j.date - d.date))] : null;
-  };
-  const journalPanel = d3.select("#journal");
-  const journalHint = "Click a data point to read the journal entry from that time.";
-  const fillPanel = d => {
-    journalPanel.html("");
-    if (!d) return journalPanel.append("p").attr("class", "journal-hint").text(journalHint);
-    const e = entryFor(d);
-    const dose = d.dose_mg === null ? "dose n/a" : `${d3.format("~g")(d.dose_mg)} mg/day`;
-    journalPanel.append("h3").text(fmtLong(d.date));
-    journalPanel.append("p").attr("class", "journal-meta").text(`${dose} · ${d.status.replace("_", " ")}`);
-    journalPanel.append("p").attr("class", e ? "journal-entry" : "journal-hint")
-      .text(e ? e.entry : "No journal entry for this draw.");
-  };
-  // Fades the old entry out and the new one in (the fade itself is a CSS transition).
-  let swap = null;
-  const showJournal = d => {
-    if (d === opened) return;
-    opened = d;
-    journalPanel.classed("faded", true);
-    clearTimeout(swap);
-    swap = setTimeout(() => { fillPanel(d); journalPanel.classed("faded", false); }, 200);
-  };
-  fillPanel(null);
-
-  render();
-  d3.selectAll("#dose-view button").on("click", function () { mode = this.value; render(); });
-  // Reset clears the zoom, the marker and the journal panel but keeps the current view.
-  d3.select("#dose-reset").on("click", () => { 
-    zoom = null; 
-    allZoom = null; 
-    pinned = null; 
-    showJournal(null); 
-    render(); 
+  // The clicked marker's date. Reset clears it and the zoom.
+  let pinned = null;
+  d3.select("#dose-reset").on("click", () => {
+    allZoom = null;
+    pinned = null;
+    render();
   });
-
-  // Rebuilds the whole chart, since overlay has one lab panel instead of three.
-  function render() {
-    d3.selectAll("#dose-view button").classed("active", function () { return this.value === mode; });
-    d3.select("#side").style("display", mode === "all" ? "none" : null);
-    d3.select("#marker-group").style("display", mode === "all" ? null : "none");
-    d3.select(".chart-header").classed("all-mode", mode === "all");
-    if (mode === "all") return renderAll();
-    const overlay = mode === "overlay";
-    const panelLabs = overlay ? [LABS] : LABS.map(lab => [lab]);
-
-    // Layout: dose, lab panel(s), status strip (same height ratios as the notebook), lookalikes strip.
-    const width = 1000;
-    const margin = { top: 8, right: overlay ? 100 : 16, bottom: 76, left: 110 };
-    const gap = 14;
-    const ratios = [1.3, ...panelLabs.map(() => overlay ? 6.5 : 2), 0.45, 1.6];
-    const unit = 62;
-    const heights = ratios.map(r => r * unit);
-    const last = heights.length - 1;
-    // Extra room under the lab panels for the note about open circles and green bands.
-    const noteH = 22;
-    // And between the two strips, for the callout buttons.
-    const calloutH = 16;
-    const tops = heights.map((_, i) => margin.top + d3.sum(heights.slice(0, i)) + gap * i
-      + (i >= last - 1 ? noteH : 0) + (i === last ? calloutH : 0));
-    const height = tops[last] + heights[last] + margin.bottom;
-    const innerW = width - margin.left - margin.right;
-
-    const x = d3.scaleUtc().domain(zoom || [xMin, xEnd]).range([0, innerW]);
-
-    d3.select("#dose-chart").html("");
-    const svg = d3.select("#dose-chart").append("svg")
-      .attr("viewBox", [0, 0, width, height])
-      .attr("role", "img")
-      .attr("aria-label", "Methimazole dose, TSH, Free T4, Total T3 and thyroid status over time");
-
-    // Data marks are clipped to the plot area so zooming doesn't spill into the axes.
-    svg.append("defs").append("clipPath").attr("id", "dose-clip")
-      .append("rect").attr("y", -20).attr("width", innerW).attr("height", height);
-    const clip = sel => sel.attr("clip-path", "url(#dose-clip)");
-
-    const root = svg.append("g").attr("transform", `translate(${margin.left},0)`);
-    const panel = i => root.append("g").attr("transform", `translate(0,${tops[i]})`);
-
-    const panelLabel = (g, h, lines) => {
-      const t = g.append("text").attr("class", "panel-label")
-        .attr("text-anchor", "middle")
-        .attr("transform", `translate(${-80},${h / 2}) rotate(-90)`);
-      lines.forEach((line, i) => t.append("tspan")
-        .attr("x", 0).attr("dy", i === 0 ? `${-(lines.length - 1) * 0.6}em` : "1.2em").text(line));
-    };
-
-    // Methimazole dose: step line with a light fill.
-    {
-      const g = panel(0), h = heights[0];
-      const y = d3.scaleLinear().domain([0, 13]).range([h, 0]);
-      const pts = known.map(d => [d.start, d.dose_mg]).concat([[known.at(-1).end, known.at(-1).dose_mg]]);
-      g.append("g").attr("class", "grid").call(d3.axisLeft(y).ticks(3).tickSize(-innerW).tickFormat(""));
-      g.append("path").datum(pts).call(clip)
-        .attr("fill", BLUE).attr("fill-opacity", 0.12)
-        .attr("d", d3.area().curve(d3.curveStepAfter).x(d => x(d[0])).y0(h).y1(d => y(d[1])));
-      g.append("path").datum(pts).call(clip)
-        .attr("fill", "none").attr("stroke", BLUE).attr("stroke-width", 2.5)
-        .attr("d", d3.line().curve(d3.curveStepAfter).x(d => x(d[0])).y(d => y(d[1])));
-      g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(3));
-      g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
-        .call(d3.axisBottom(x).tickFormat("").tickSizeOuter(0));
-      panelLabel(g, h, ["Methimazole", "(mg/day)"]);
-    }
-
-    // Lab panels. Normalized and overlay put 0 at the bottom of the reference range and 1 at the top;
-    // TSH is normalized on a log scale.
-    // Every lab point's position in the chart, so a click can tell whether it landed on one.
-    const points = [];
-    panelLabs.forEach((group, i) => {
-      const g = panel(i + 1), h = heights[i + 1];
-      let y, yAxis, band, value, label;
-      if (mode === "raw") {
-        const lab = group[0], [lo, hi] = REF[lab];
-        value = d => d.value;
-        if (lab === "TSH") {
-          y = d3.scaleLog().domain([0.006, 8]).range([h, 0]);
-        } else {
-          const ext = d3.extent([...series[lab].map(d => d.value), lo, hi]);
-          const pad = (ext[1] - ext[0]) * 0.08;
-          y = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([h, 0]).nice();
-        }
-        yAxis = () => lab === "TSH"
-          ? d3.axisLeft(y).tickValues([0.01, 0.1, 1, 4]).tickFormat(v => v === 0.01 ? "<0.01" : d3.format("~g")(v))
-          : d3.axisLeft(y).ticks(4);
-        band = [lo, hi];
-        label = [LAB_NAMES[lab], `(${UNITS[lab]})`];
-      } else {
-        value = d => normalize(d.lab, d.value);
-        y = d3.scaleLinear().domain([-1.5, 3.3]).range([h, 0]);
-        yAxis = () => d3.axisLeft(y).tickValues([0, 1]).tickFormat(v => v === 0 ? "low limit" : "high limit");
-        band = [0, 1];
-        label = overlay ? ["position in reference range", "(0 = low limit, 1 = high limit)"]
-          : group[0] === "TSH" ? ["TSH", "(log scale)"] : [LAB_NAMES[group[0]]];
-      }
-
-      g.append("rect")
-        .attr("x", 0).attr("width", innerW)
-        .attr("y", y(band[1])).attr("height", y(band[0]) - y(band[1]))
-        .attr("fill", REF_GREEN).attr("fill-opacity", 0.3);
-      g.append("g").attr("class", "grid").call(yAxis().tickSize(-innerW).tickFormat(""));
-      group.forEach(lab => {
-        const s = series[lab];
-        g.append("path").datum(s).call(clip)
-          .attr("fill", "none").attr("stroke", LAB_COLORS[lab]).attr("stroke-width", 3.0)
-          .attr("d", d3.line().x(d => x(d.date)).y(d => y(value(d))));
-        g.append("g").call(clip).selectAll("circle").data(s).join("circle")
-          .attr("cx", d => x(d.date)).attr("cy", d => y(value(d))).attr("r", 4.5)
-          .attr("fill", d => d.censored ? SURFACE : LAB_COLORS[lab])
-          .attr("stroke", d => d.censored ? LAB_COLORS[lab] : SURFACE)
-          .attr("stroke-width", 1.5);
-        s.forEach(r => points.push({
-          draw: draws.find(d => d.id === r.draw_id), cx: x(r.date), cy: tops[i + 1] + y(value(r)),
-        }));
-      });
-
-      g.append("g").attr("class", "axis").call(yAxis());
-      g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
-        .call(d3.axisBottom(x).tickFormat("").tickSizeOuter(0));
-      panelLabel(g, h, label);
-
-      if (overlay) {
-        const item = g.append("g")
-          .attr("class", "legend")
-          .attr("transform", `translate(${innerW + 16},0)`)
-          .selectAll("g")
-          .data(LABS)
-          .join("g")
-          .attr("transform", (_, j) => `translate(0,${j * 20})`);
-
-        item.append("line")
-          .attr("x2", 18)
-          .attr("y1", 6)
-          .attr("y2", 6)
-          .attr("stroke", lab => LAB_COLORS[lab])
-          .attr("stroke-width", 3);
-
-        item.append("text")
-          .attr("x", 24)
-          .attr("y", 6)
-          .attr("dy", "0.35em")
-          .text(lab => LAB_NAMES[lab]);
-      }
-    });
-
-    root.append("text").attr("class", "chart-note").attr("y", tops[last - 1] - gap - 2)
-      .text("Open circles are TSH results below the detection limit (<0.01). Green bands are the UCSD lab's reference ranges.");
-
-    d3.select("#dose-title").text(`Thyroid labs vs. methimazole dose (${mode})`);
-
-    // Status strip: each draw's classification held until the next draw.
-    {
-      const g = panel(last - 1), h = heights[last - 1];
-      g.append("g").call(clip).selectAll("rect").data(status).join("rect")
-        .attr("x", d => x(d.start))
-        .attr("width", d => x(d.end || xEnd) - x(d.start))
-        .attr("y", 0).attr("height", h)
-        .attr("fill", d => STATUS_COLORS[d.status]).attr("fill-opacity", 0.75);
-      g.append("text").attr("class", "panel-label")
-        .attr("x", -8).attr("y", h / 2).attr("dy", "0.35em").attr("text-anchor", "end").text("My Status*");
-    }
-
-    // Lookalikes strip, right under the doctor's call: what the closest Kaggle patients were
-    // diagnosed with, stacked hyper / normal / hypo (bottom to top, as in the notebook).
-    {
-      const g = panel(last), h = heights[last];
-      const y = d3.scaleLinear().domain([0, 1]).range([h, 0]);
-      const segments = lookalikes.flatMap(d => {
-        let below = 0;
-        return LOOKALIKE_GROUPS.map(grp => {
-          const s = { d, grp, y0: below, y1: below + d[grp] };
-          below = s.y1;
-          return s;
-        }).filter(s => s.y1 > s.y0);
-      });
-      const cells = g.append("g").call(clip).selectAll("g").data(segments).join("g");
-      cells.append("rect")
-        .attr("x", s => x(s.d.start))
-        .attr("width", s => x(s.d.end || xEnd) - x(s.d.start))
-        .attr("y", s => y(s.y1)).attr("height", s => y(s.y0) - y(s.y1))
-        .attr("fill", s => LOOKALIKE_COLORS[s.grp]).attr("fill-opacity", 0.75)
-        .attr("stroke", SURFACE).attr("stroke-width", 1);
-      // Percentages only where the segment has room for them.
-      cells.filter(s => x(s.d.end || xEnd) - x(s.d.start) >= 30 && y(s.y0) - y(s.y1) >= 13)
-        .append("text").attr("class", "strip-value")
-        .attr("x", s => (x(s.d.start) + x(s.d.end || xEnd)) / 2).attr("y", s => y((s.y0 + s.y1) / 2))
-        .attr("dy", "0.35em").attr("text-anchor", "middle")
-        .text(s => d3.format(".0%")(s.y1 - s.y0));
-      const label = g.append("text").attr("class", "panel-label").attr("text-anchor", "end")
-        .attr("y", h / 2 - 14);
-      ["Lookalikes**", `(${K} closest`, "Kaggle patients)"].forEach((line, i) => label.append("tspan")
-        .attr("x", -8).attr("dy", i === 0 ? "0.35em" : "1.2em").text(line));
-
-      // Quarterly ticks for the full timeline; finer ticks (with the day) when zoomed in.
-      const span = (x.domain()[1] - x.domain()[0]) / DAY;
-      const ticks = span > 540
-        ? x.ticks(d3.utcMonth.every(3)).filter(d => [0, 3, 6, 9].includes(d.getUTCMonth()))
-        : x.ticks(10);
-      const xAxis = g.append("g").attr("class", "axis").attr("transform", `translate(0,${h})`)
-        .call(d3.axisBottom(x).tickValues(ticks).tickFormat(d3.utcFormat(span > 120 ? "%b" : "%b %d")).tickSizeOuter(0));
-      xAxis.selectAll(".tick text").append("tspan")
-        .attr("x", 0).attr("dy", "1.2em").text(d => d3.utcFormat("%Y")(d));
-
-      // Footnote for the lookalikes strip, where the legend used to be.
-      const foot = g.append("text").attr("class", "chart-note").attr("y", h + 50);
-      foot.append("tspan").attr("font-weight", 600).attr("fill", INK).text("** Lookalikes: ");
-      foot.append("tspan").text(`What the ${K} Kaggle patients with the closest TSH and T3 were diagnosed with. Their clinicians also had T4, symptoms`);
-      foot.append("tspan").attr("x", 0).attr("dy", "1.4em")
-        .text("and treatment history, so this can differ from My Status, which only compares my labs to the UCSD reference ranges.");
-    }
-
-    // Hover: a vertical line through every panel at the cursor. Click to leave a marker there.
-    const readout = d3.select("#dose-readout");
-    d3.select("#dose-hint").text("Hover over data points to view detailed information. Click to drop a point-in-time marker. "
-      + "Select and drag a range to zoom in. Click a pulsating + to view diagnosis differences between My Status and the lookalikes.");
-    const fmtDate = d3.utcFormat("%b %d, %Y");
-    const guide = (dash, width) => tops.map((t, i) => root.append("line")
-      .attr("y1", t).attr("y2", t + heights[i])
-      .attr("stroke", INK).attr("stroke-width", width).attr("stroke-opacity", 0.7)
-      .attr("stroke-dasharray", dash)
-      .attr("pointer-events", "none").style("visibility", "hidden"));
-    const vlines = guide(null, 1);
-    const markers = guide("4 3", 1.5);
-    const nearestDraw = t => draws[d3.minIndex(draws, v => Math.abs(v.date - t))];
-    // The draw whose data point is under the cursor (within a few pixels), if any.
-    const drawAt = (px, py) => {
-      const near = points.filter(p => p.cx >= 0 && p.cx <= innerW && Math.hypot(p.cx - px, p.cy - py) <= 8);
-      return near.length ? near[d3.minIndex(near, p => Math.hypot(p.cx - px, p.cy - py))].draw : null;
-    };
-
-    const describe = d => {
-      const vals = LABS.map(lab => {
-        const r = series[lab].find(v => v.draw_id === d.id);
-        if (!r) return `${LAB_NAMES[lab]} –`;
-        return `${SHORT_NAMES[lab]} ${r.censored ? "<0.01" : d3.format("~g")(r.value)} ${HOVER_UNITS[lab]}`;
-      });
-      const dose = d.dose_mg === null ? "n/a" : `${d3.format("~g")(d.dose_mg)} mg/day`;
-      const look = lookalikes.find(l => +l.start === +d.date);
-      const lookText = look
-        ? LOOKALIKE_GROUPS.filter(grp => look[grp] > 0).map(grp => `${d3.format(".0%")(look[grp])} ${grp}`).join(", ")
-        : "n/a (no T3)";
-      return `<strong>${fmtDate(d.date)}</strong> · ${dose} · ${d.status.replace("_", " ")}<br>${vals.join(" · ")}`
-        + `<br>Lookalikes: ${lookText}`;
-    };
-
-    const showPinned = () => {
-      const onScreen = pinned && x(pinned) >= 0 && x(pinned) <= innerW;
-      markers.forEach(l => l.attr("x1", x(pinned)).attr("x2", x(pinned))
-        .style("visibility", onScreen ? "visible" : "hidden"));
-      if (onScreen) readout.html(describe(nearestDraw(pinned)));
-      else readout.text("");
-      d3.select("#dose-reset").property("disabled", !zoom && !pinned);
-    };
-    showPinned();
-
-    // Drag selection shown while zooming.
-    const plotTop = margin.top, plotH = tops[last] + heights[last] - margin.top;
-    const selection = root.append("rect")
-      .attr("y", plotTop).attr("height", plotH)
-      .attr("fill", INK).attr("fill-opacity", 0.08).attr("stroke", INK2).attr("stroke-opacity", 0.4)
-      .attr("pointer-events", "none").style("visibility", "hidden");
-
-    let current = null, dragStart = null;
-    const pointerX = event => Math.max(0, Math.min(innerW, d3.pointer(event, root.node())[0]));
-    root.append("rect")
-      .attr("y", plotTop).attr("width", innerW).attr("height", plotH)
-      .attr("fill", "transparent").style("cursor", "crosshair")
-      .on("pointerdown", event => {
-        dragStart = pointerX(event);
-        event.currentTarget.setPointerCapture(event.pointerId);
-      })
-      .on("pointermove", event => {
-        // The line follows the cursor; the readout shows the nearest draw.
-        const px = pointerX(event);
-        vlines.forEach(l => l.attr("x1", px).attr("x2", px).style("visibility", "visible"));
-        if (dragStart !== null && Math.abs(px - dragStart) > 5) {
-          selection.attr("x", Math.min(px, dragStart)).attr("width", Math.abs(px - dragStart))
-            .style("visibility", "visible");
-        }
-        const py = d3.pointer(event, root.node())[1];
-        d3.select(event.currentTarget).style("cursor", drawAt(px, py) ? "pointer" : "crosshair");
-        const d = nearestDraw(x.invert(px));
-        if (d === current) return;
-        current = d;
-        readout.html(describe(d));
-      })
-      .on("pointerup", event => {
-        if (dragStart === null) return;
-        const px = pointerX(event), start = dragStart;
-        dragStart = null;
-        selection.style("visibility", "hidden");
-        if (Math.abs(px - start) > 5) {
-          // Dragged: zoom to the selected range (at least a week).
-          let [a, b] = [x.invert(Math.min(px, start)), x.invert(Math.max(px, start))];
-          if (b - a < 7 * DAY) b = new Date(+a + 7 * DAY);
-          zoom = [a, b];
-          render();
-          return;
-        }
-        // Clicked: a data point pins its draw and opens its journal entry (clicking the pinned
-        // draw again closes it). Anywhere else leaves a marker; clicking the marker removes it.
-        const d = drawAt(px, d3.pointer(event, root.node())[1]);
-        if (d) pinned = pinned && +pinned === +d.date ? null : d.date;
-        else if (pinned && Math.abs(x(pinned) - px) < 6) pinned = null;
-        else pinned = x.invert(px);
-        showJournal(pinned && d ? d : null);
-        showPinned();
-        current = null;
-      })
-      .on("dblclick", () => { if (zoom) { zoom = null; render(); } })
-      .on("pointerleave", () => {
-        current = null;
-        vlines.forEach(l => l.style("visibility", "hidden"));
-        showPinned();
-      });
-
-    // Callout buttons in the gap between the strips, drawn above the hover area so they take the click.
-    // Opening one outlines its stretch across both strips and shows the note above it.
-    const stripTop = tops[last - 1], stripBottom = tops[last] + heights[last];
-    const callouts = CALLOUTS.map((c, i) => {
-      const endSpan = lookalikes.find(l => +l.start === +parseDate(c.end));
-      const x0 = x(parseDate(c.start)), x1 = x(endSpan.end || xEnd);
-      return { ...c, i, x0, x1, cx: (x0 + x1) / 2 };
-    }).filter(c => c.cx >= 0 && c.cx <= innerW);
-
-    const open = callouts.find(c => c.i === openCallout);
-    if (open) {
-      const layer = root.append("g").attr("pointer-events", "none");
-      layer.append("rect").call(clip)
-        .attr("x", open.x0).attr("width", open.x1 - open.x0)
-        .attr("y", stripTop - 3).attr("height", stripBottom - stripTop + 6).attr("rx", 3)
-        .attr("fill", "none").attr("stroke", INK).attr("stroke-width", 1.5);
-      const box = layer.append("g");
-      const text = box.append("text").attr("class", "callout-text").attr("y", 18);
-      open.lines.forEach((line, j) => text.append("tspan").attr("x", 10).attr("dy", j ? "1.3em" : 0).text(line));
-      const w = text.node().getBBox().width + 20, boxH = open.lines.length * 15.6 + 12;
-      // To the left of the stretch, centred on the two strips. It may cover the row labels while open;
-      // it only moves to the right of the stretch if even the label column has no room.
-      const minLeft = 4 - margin.left;
-      const left = open.x0 - 10 - w >= minLeft ? open.x0 - 10 - w : Math.min(innerW - w, open.x1 + 10);
-      box.attr("transform", `translate(${left},${(stripTop + stripBottom - boxH) / 2})`);
-      box.insert("rect", "text").attr("width", w).attr("height", boxH).attr("rx", 4)
-        .attr("fill", SURFACE).attr("stroke", INK2).attr("stroke-width", 0.8);
-    }
-
-    const toggleCallout = c => {
-      openCallout = openCallout === c.i ? null : c.i;
-      seenCallouts.add(c.i);
-      render();
-    };
-    const button = root.append("g").selectAll("g").data(callouts).join("g")
-      .attr("class", "callout-button")
-      .attr("transform", c => `translate(${c.cx},${tops[last] - (gap + calloutH) / 2})`)
-      .attr("role", "button").attr("tabindex", 0)
-      .attr("aria-label", c => `${c.i === openCallout ? "Hide" : "Show"} note: ${c.lines.join(", ")}`)
-      .style("cursor", "pointer")
-      .on("click", (_, c) => toggleCallout(c))
-      .on("keydown", (event, c) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        toggleCallout(c);
-      });
-    // A soft ring pulses around buttons that haven't been opened yet.
-    button.filter(c => !seenCallouts.has(c.i)).append("circle").attr("class", "callout-pulse")
-      .attr("r", 7).attr("fill", CALLOUT_GREY);
-    button.append("circle").attr("r", 7).attr("fill", CALLOUT_GREY).attr("stroke", SURFACE).attr("stroke-width", 1.5);
-    button.append("text").attr("class", "callout-sign").attr("dy", "0.35em").attr("text-anchor", "middle")
-      .text(c => c.i === openCallout ? "−" : "+");
-  }
 
   // All biomarkers: one small chart per test on a shared time axis, in a fixed order
   // (thyroid first, then by group, then test).
@@ -517,7 +47,7 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
     .sort((a, b) => d3.ascending(a.group !== "Thyroid", b.group !== "Thyroid") || d3.ascending(a.group, b.group) || d3.ascending(a.test, b.test));
   const bioDates = [...new Set(bio.map(d => +d.date))].sort((a, b) => a - b).map(t => new Date(t));
   const onDose = known.filter(d => d.dose_mg > 0);
-  // On a draw date, use the dose taken at that draw (as the other views do); spans start on the
+  // On a draw date, use the dose taken at that draw (as the flashcards do); spans start on the
   // day of the change, so a span lookup alone would report the next dose (or n/a after the last draw).
   const doseOn = t => {
     const draw = draws.find(d => +d.date === +t);
@@ -527,25 +57,23 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
   };
   const fmtValue = d => `${d.censor || ""}${d3.format("~g")(d.value)}`;
 
-  // Group dropdown for the All Markers view (thyroid included, listed first). It opens on a short list of
+  // Group dropdown (thyroid included, listed first). It opens on a short list of
   // labs that changed while my thyroid was overactive, so the first view isn't all 73 tests at once.
   const HIGHLIGHT = "Highlights";
   const HIGHLIGHT_TESTS = ["Cholesterol", "LDL-Chol (Calc)", "Alkaline Phosphatase", "Creatinine"];
   const groupTitle = g => g === HIGHLIGHT ? "Labs that changed while my thyroid was overactive"
     : g === "All" ? "All biomarkers over time" : `${g} over time`;
   let group = HIGHLIGHT;
-  // All Markers has its own zoom: it covers 2017 on, while the other views start at the first thyroid draw.
+  // Zoomed time range; the charts cover 2017 on.
   let allZoom = null;
   d3.select("#marker-group").selectAll("option")
     .data([HIGHLIGHT, "All", ...new Set(tests.map(t => t.group))]).join("option")
     .attr("value", d => d).text(d => d === HIGHLIGHT ? "Labs that changed" : d === "All" ? "All groups" : d);
   d3.select("#marker-group").property("value", group);
   d3.select("#marker-group").on("change", function () { group = this.value; render(); });
-  // The flashcards above now carry the thyroid story, so this section opens on every other lab (All Markers).
-  mode = "all";
   render();
 
-  function renderAll() {
+  function render() {
     // Any single group other than Thyroid gets TSH, Free T4 and T3 as its first row, for comparison.
     const thyroid = group === "All" || group === "Thyroid" ? []
       : ["TSH", "Free T4", "T3 Total"].map(name => tests.find(t => t.test === name)).filter(Boolean);
@@ -733,7 +261,6 @@ function draw(raw, journalEntries, allLabs, lookalikeData) {
       readout.html(`<strong>${fmtDate(day)}</strong> &nbsp; methimazole: ${mg === null ? "n/a" : `${d3.format("~g")(mg)} mg/day`}`);
     }
 
-    // The marker is shared with the other views, so one set there shows here too.
     function showPinned() {
       const onScreen = pinned && x(pinned) >= 0 && x(pinned) <= plotW;
       markers.forEach(l => l.attr("x1", onScreen ? x(pinned) : 0).attr("x2", onScreen ? x(pinned) : 0)

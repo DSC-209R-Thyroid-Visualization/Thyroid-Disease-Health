@@ -311,33 +311,6 @@ h2 {
   font-weight: 600;
 }
 
-.toggle {
-  display: inline-flex;
-  margin-top: 10px;
-  border: 1px solid var(--muted);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.toggle button {
-  border: 0;
-  background: transparent;
-  color: var(--ink2);
-  font: inherit;
-  font-size: 12px;
-  padding: 5px 14px;
-  cursor: pointer;
-}
-
-.toggle button + button {
-  border-left: 1px solid var(--muted);
-}
-
-.toggle button.active {
-  background: var(--ink);
-  color: var(--surface);
-}
-
 .reset {
   margin-left: 8px;
   border: 1px solid var(--muted);
@@ -378,10 +351,6 @@ h2 {
 .controls h2 {
   flex-basis: 100%;
   margin-bottom: 10px;
-}
-
-.controls .toggle {
-  margin-top: 0;
 }
 
 .hint {
@@ -449,11 +418,6 @@ h2 {
   font-size: 16px;
 }
 
-.chart-note {
-  fill: var(--ink2);
-  font-size: 12px;
-}
-
 .chart-row {
   display: flex;
   gap: 24px;
@@ -463,50 +427,6 @@ h2 {
 #dose-chart {
   flex: 1;
   min-width: 0;
-}
-
-/* Right column: the journal at the top, the status key near the status strip. */
-.side {
-  flex: 0 0 260px;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-}
-
-.journal {
-  margin-top: 170px;
-  padding: 16px 18px;
-  border-left: 3px solid var(--muted);
-  line-height: 1.55;
-  transition: opacity 0.35s ease;
-}
-
-.journal.faded {
-  opacity: 0;
-  transition-duration: 0.2s;
-}
-
-.journal h3 {
-  margin: 0 0 4px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.journal-meta {
-  margin: 0 0 12px;
-  color: var(--ink2);
-  font-size: 12px;
-}
-
-.journal-entry {
-  margin: 0;
-  white-space: pre-line;
-}
-
-.journal-hint {
-  margin: 0;
-  color: var(--ink2);
-  font-style: italic;
 }
 
 #dose-chart svg {
@@ -564,78 +484,6 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
-.strip-value {
-  fill: var(--surface);
-  font-size: 10px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-}
-
-.status-key {
-  margin: auto 0 30px;
-  padding-left: 21px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: var(--ink2);
-}
-
-.status-key dt {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.status-key dd {
-  margin: 0 0 6px;
-}
-
-.status-key .swatch {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 6px;
-  border-radius: 2px;
-  opacity: 0.75;
-}
-
-.callout-text {
-  fill: var(--ink);
-  font-size: 12px;
-}
-
-.callout-sign {
-  fill: var(--surface);
-  font-size: 12px;
-  font-weight: 700;
-  pointer-events: none;
-}
-
-.callout-button:focus {
-  outline: none;
-}
-
-.callout-button:focus-visible circle:not(.callout-pulse) {
-  stroke: var(--ink);
-  stroke-width: 2;
-}
-
-/* A soft ring that grows and fades around callout buttons not opened yet. */
-.callout-pulse {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: callout-pulse 2.2s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes callout-pulse {
-  from { transform: scale(1); opacity: 0.45; }
-  to { transform: scale(2.4); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .callout-pulse { animation: none; opacity: 0.2; transform: scale(1.6); }
-}
-
 @media (max-width: 1100px) {
   .page-icons {
     position: static;
@@ -670,12 +518,6 @@ h2 {
   color: var(--ink);
 }
 
-/* The readout keeps its width whether or not it has text, so hovering never reflows the
-   controls and moves the chart under the cursor. */
-.chart-header:not(.all-mode) .readout {
-  flex: 0 0 300px;
-}
-
 /* Narrow screens: stack the side column under the chart, and let the timeline scroll
    sideways inside its own box instead of shrinking until it can't be read. */
 @media (max-width: 900px) {
@@ -703,12 +545,6 @@ h2 {
     gap: 8px;
   }
 
-  .chart-header:not(.all-mode) .readout {
-    flex: none;
-    max-width: none;
-    text-align: left;
-  }
-
   .hint,
   .chart-header.all-mode .hint {
     flex: 1 1 100%;
@@ -728,19 +564,6 @@ h2 {
 
   #dose-chart svg {
     min-width: 760px;
-  }
-
-  .side {
-    flex: none;
-    width: 100%;
-  }
-
-  .journal {
-    margin-top: 16px;
-  }
-
-  .status-key {
-    margin: 16px 0 0;
   }
 
   .writeup {
@@ -1103,9 +926,4 @@ h2 {
     flex: none;
     width: 100%;
   }
-}
-
-/* Only All Markers is used now, so its view toggle stays hidden. */
-#dose-view[hidden] {
-  display: none;
 }
